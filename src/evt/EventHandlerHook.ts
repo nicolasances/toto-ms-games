@@ -4,10 +4,8 @@ import { ParsedQs } from "qs";
 import { ExecutionContext } from "../controller/model/ExecutionContext";
 import { FakeRequest, TotoDelegate } from "../controller/model/TotoDelegate";
 import { UserContext } from "../controller/model/UserContext";
-import { OnExpenseTagged } from "./handlers/OnExpenseTagged";
 import { TotoEvent } from "./TotoEvent";
 import { AEventHandler } from "./EventHanlder";
-import { OnTagDeleted } from "./handlers/OnTagDeleted";
 import { EVENTS } from "./EventPublisher";
 
 export class EventHandlerHook implements TotoDelegate {
