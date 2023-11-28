@@ -1,12 +1,12 @@
 import { Request } from "express";
-import { TotoDelegate } from "../../controller/model/TotoDelegate";
-import { UserContext } from "../../controller/model/UserContext";
-import { ExecutionContext } from "../../controller/model/ExecutionContext";
-import { ControllerConfig } from "../../Config";
-import { ValidationError } from "../../controller/validation/Validator";
-import { TotoRuntimeError } from "../../controller/model/TotoRuntimeError";
+import { TotoDelegate } from "../../../controller/model/TotoDelegate";
+import { UserContext } from "../../../controller/model/UserContext";
+import { ExecutionContext } from "../../../controller/model/ExecutionContext";
+import { ControllerConfig } from "../../../Config";
+import { ValidationError } from "../../../controller/validation/Validator";
+import { TotoRuntimeError } from "../../../controller/model/TotoRuntimeError";
 import { Storage } from "@google-cloud/storage";
-import { EVENTS, EventPublisher } from "../../evt/EventPublisher";
+import { EVENTS, EventPublisher } from "../../../evt/EventPublisher";
 
 const storage = new Storage();
 
