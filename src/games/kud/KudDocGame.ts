@@ -200,7 +200,7 @@ export class KudDocGame {
             const db = client.db(this.config.getDBName());
 
             // Update the kud
-            new KudDocGameStore(db, this.config).updateKudStatus(userEmail, kudId, KudStatus.processed)
+            await new KudDocGameStore(db, this.config).updateKudStatus(userEmail, kudId, KudStatus.processed)
 
 
         } catch (error) {
