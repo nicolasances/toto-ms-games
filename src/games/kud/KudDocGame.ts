@@ -150,12 +150,15 @@ export class KudDocGame {
      */
     async onKudUploaded(kudId: string, userEmail: string) {
 
+        
         let client;
-
+        
         try {
-
+            
             client = await this.config.getMongoClient();
             const db = client.db(this.config.getDBName());
+
+            this.logger.compute(this.cid, `Updating Game to register Kud Doc Upload`)
 
             // Update the kud game with a new kud uploaded
             await new KudDocGameStore(db, this.config).onKudUploaded(userEmail, kudId);
