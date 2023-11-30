@@ -5,7 +5,7 @@ import { TotoRuntimeError } from "../../controller/model/TotoRuntimeError";
 import { UserContext } from "../../controller/model/UserContext";
 import { ValidationError } from "../../controller/validation/Validator";
 import { Logger } from "../../logger/TotoLogger";
-import { KudDocGameStore } from "../../store/KudDocGameStore";
+import { KudDocGameStore, KudStatus } from "../../store/KudDocGameStore";
 
 /**
  * Kud Doc Game 
@@ -143,9 +143,101 @@ export class KudDocGame {
 
     }
 
+    /**
+     * Reacts to an event of kud uploaded 
+     * 
+     * This method will update that kud's state as "uploaded"
+     */
+    async onKudUploaded(kudId: string, userEmail: string) {
+
+        let client;
+
+        try {
+
+            client = await this.config.getMongoClient();
+            const db = client.db(this.config.getDBName());
+
+            // Update the kud game with a new kud uploaded
+            await new KudDocGameStore(db, this.config).onKudUploaded(userEmail, kudId);
+
+
+        } catch (error) {
+
+            this.logger.compute(this.cid, `${error}`, "error")
+
+            if (error instanceof ValidationError || error instanceof TotoRuntimeError) {
+                throw error;
+            }
+            else {
+                console.log(error);
+                throw error;
+            }
+
+        }
+        finally {
+            if (client) client.close();
+        }
+
+    }
+
+    /**
+     * Reacts to an event of kud processed (by the toto-ms-kud microservice).
+     * 
+     * This method will perform the following: 
+     * 1. Find the kud in the list of kuds that have been uploaded 
+     * 2. Update that kud's state as "processed"
+     */
+    async onKudProcessed(kudId: string, userEmail: string) {
+
+        let client;
+
+        try {
+
+            client = await this.config.getMongoClient();
+            const db = client.db(this.config.getDBName());
+
+            // Update the kud
+            new KudDocGameStore(db, this.config).updateKudStatus(userEmail, kudId, KudStatus.processed)
+
+
+        } catch (error) {
+
+            this.logger.compute(this.cid, `${error}`, "error")
+
+            if (error instanceof ValidationError || error instanceof TotoRuntimeError) {
+                throw error;
+            }
+            else {
+                console.log(error);
+                throw error;
+            }
+
+        }
+        finally {
+            if (client) client.close();
+        }
+
+    }
+
 }
 
 export interface KudYearMonth {
     year: number
     month: number
+}
+
+/**
+ * Generates a kud Id based on the reference year and month
+ * @param year the year as an integer
+ * @param month the month as an integer
+ */
+export function kudId(year: number, month: number) {
+
+    let yearString = String(year)
+    let monthString = String(month)
+
+    if (monthString.length == 1) monthString = `0${monthString}`
+
+    return `kud-${yearString}-${monthString}`
+
 }

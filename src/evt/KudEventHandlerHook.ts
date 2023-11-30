@@ -7,21 +7,20 @@ import { UserContext } from "../controller/model/UserContext";
 import { TotoEvent } from "./TotoEvent";
 import { AEventHandler } from "./EventHanlder";
 import { EVENTS } from "./EventPublisher";
+import { OnKudProcessed } from "./handlers/OnKudProcessed";
 
-export class EventHandlerHook implements TotoDelegate {
+export class KudEventHandlerHook implements TotoDelegate {
 
     async do(req: Request, userContext: UserContext, execContext: ExecutionContext): Promise<any> {
 
         const logger = execContext.logger;
         const cid = execContext.cid;
 
-        logger.compute(cid, `Received message from PubSub`);
+        logger.compute(cid, `Received a Kud Event from PubSub`);
 
         const HANDLERS: IIndexable = {
 
-            // [EVENTS.expenseTagged]: [new OnExpenseTagged(execContext)],
-            // [EVENTS.expenseUntagged]: [new OnExpenseTagged(execContext)],
-            // [EVENTS.tagDeleted]: [new OnTagDeleted(execContext)]
+            [ACCEPTED_EVENTS.kudProcessed]: [new OnKudProcessed(userContext, execContext)],
 
         }
 
@@ -46,4 +45,11 @@ export class EventHandlerHook implements TotoDelegate {
 
 export interface IIndexable {
     [key: string]: Array<AEventHandler>;
+}
+
+export const ACCEPTED_EVENTS = {
+
+    // A Kud has been successfully processed by the toto-ms-kud
+    kudProcessed: "kudProcessed"
+
 }
