@@ -62,7 +62,8 @@ export class KudDocGame {
             }
 
             // Stopping condition
-            if (curYear >= endYear && curMonth > endMonth) stop = true;
+            if (curYear > endYear) stop = true;
+            else if (curYear == endYear && curMonth > endMonth) stop = true;
 
         }
 
