@@ -26,6 +26,8 @@ export class OnKudProcessed extends AEventHandler {
 
         await new KudDocGame(this.userContext, this.execContext).onKudProcessed(kudId, userEmail);
 
+        this.execContext.logger.compute(this.execContext.cid, `Successfully processed kud [${kudId}] for user [${userEmail}]`)
+
         return { eventProcessed: true }
 
     }
