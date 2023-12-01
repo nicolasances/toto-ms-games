@@ -103,6 +103,8 @@ export class KudDocGame {
 
             }
 
+            this.logger.compute(this.cid, `Map of Completed Kuds computed: [${JSON.stringify(completedKudsMap)}]`)
+
             // Compare the two lists and find the missing Kuds
             let missingKuds = [] as KudYearMonth[]
 
@@ -121,6 +123,8 @@ export class KudDocGame {
                 if (!completedKudsMap[searchKey]) missingKuds.push(fullKuds[i])
 
             }
+
+            this.logger.compute(this.cid, `Missing Kuds computed: [${JSON.stringify(missingKuds)}]`)
 
             return missingKuds
 
@@ -150,11 +154,11 @@ export class KudDocGame {
      */
     async onKudUploaded(kudId: string, userEmail: string) {
 
-        
+
         let client;
-        
+
         try {
-            
+
             client = await this.config.getMongoClient();
             const db = client.db(this.config.getDBName());
 
