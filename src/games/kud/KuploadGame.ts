@@ -58,7 +58,8 @@ export class KuploadGame {
                 score: 0, 
                 maxScore: maxScore, 
                 percCompletion: 0, 
-                missingKuds: fullKudList
+                missingKuds: fullKudList, 
+                numMissingKuds: fullKudList.length
             }
 
             // Get the missing kuds
@@ -75,7 +76,9 @@ export class KuploadGame {
                 score: score,
                 maxScore: maxScore,
                 percCompletion: completionPerc,
-                missingKuds: missingKuds
+                missingKuds: missingKuds, 
+                numMissingKuds: missingKuds ? missingKuds.length : 0
+
             }
 
         } catch (error) {
@@ -311,6 +314,7 @@ export interface KuploadGameStatus {
     maxScore: number            // Maximum achievable score
     percCompletion: number      // Percentage of completion (expresssed as %, e.g. 50), rounded to 0 decimal places. Min is 0.
     missingKuds: MissingKud[]   // Array with the list of missing kuds
+    numMissingKuds: number      // Number of missing kuds (length of the missingKuds array)
 }
 
 /**
