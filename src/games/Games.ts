@@ -1,6 +1,6 @@
 
 export const Games = {
-    "kudDocUploadGame": {
-        id: "kudDocUploadGame"
+    kupload: {
+        id: "kupload"
     }
 }

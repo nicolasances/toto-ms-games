@@ -7,7 +7,7 @@ import { ValidationError } from "../../../controller/validation/Validator";
 import { TotoRuntimeError } from "../../../controller/model/TotoRuntimeError";
 import { Storage } from "@google-cloud/storage";
 import { EVENTS, EventPublisher } from "../../../evt/EventPublisher";
-import { KudDocGame, kudId } from "../../../games/kud/KudDocGame";
+import { KuploadGame, kudId } from "../../../games/kud/KuploadGame";
 
 const storage = new Storage();
 
@@ -59,7 +59,7 @@ export class PostKudDocument implements TotoDelegate {
       await bucket.upload(uploadFilepath, { destination: filepath });
 
       // Save the Game
-      await new KudDocGame(userContext, execContext).onKudUploaded(kudId(parseInt(year), parseInt(month)), userContext.email)
+      await new KuploadGame(userContext, execContext).onKudUploaded(kudId(parseInt(year), parseInt(month)), userContext.email)
 
       // Publish event on pubsub
       await new EventPublisher(execContext, "games").publishEvent(filename, EVENTS.kudUploaded, `Kud ${filename} uploaded`, { gcsFilepath: filepath, gcsBucket: gamesDataBucket, year: year, month: month, user: userContext.email })

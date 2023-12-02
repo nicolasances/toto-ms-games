@@ -22,13 +22,25 @@ export class KudDocGameStore {
     }
 
     /**
+     * Retrieves the Game information and status (complete dataset)
+     * @param userEmail the user email
+     */
+    async getGame(userEmail: string): Promise<KuploadGamePO> {
+
+        const game = await this.db.collection(this.config.getCollections().games).findOne({ [f_email]: userEmail, [f_gameId]: Games.kupload.id }) as unknown as KuploadGamePO;
+
+        return game
+
+    }
+
+    /**
      * Retrieves the Kud Documents that have been uploaded by the user
      * @param userEmail the user email
      * @returns a list of kud document ids
      */
     async getKuds(userEmail: string) {
 
-        const game = await this.db.collection(this.config.getCollections().games).findOne({ [f_email]: userEmail, [f_gameId]: Games.kudDocUploadGame.id }) as unknown as KudDocGamePO;
+        const game = await this.db.collection(this.config.getCollections().games).findOne({ [f_email]: userEmail, [f_gameId]: Games.kupload.id }) as unknown as KuploadGamePO;
 
         if (game == null) return []
 
@@ -45,7 +57,7 @@ export class KudDocGameStore {
 
         const gameFilter = {
             [f_email]: userEmail,
-            [f_gameId]: Games.kudDocUploadGame.id,
+            [f_gameId]: Games.kupload.id,
         }
 
         const clear = {
@@ -83,7 +95,7 @@ export class KudDocGameStore {
 
         const gameFilter = {
             [f_email]: userEmail,
-            [f_gameId]: Games.kudDocUploadGame.id,
+            [f_gameId]: Games.kupload.id,
             [`${f_kuds}.${f_kud_id}`]: kudId
         }
 
@@ -99,7 +111,7 @@ export class KudDocGameStore {
 
 }
 
-interface KudDocGamePO {
+export interface KuploadGamePO {
 
     [f_email]: string
     [f_gameId]: string
@@ -107,7 +119,7 @@ interface KudDocGamePO {
 
 }
 
-interface KudPO {
+export interface KudPO {
 
     [f_kud_id]: string  // A kud id will have the form "kud-year-month"
     [f_kud_status]: string
