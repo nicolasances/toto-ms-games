@@ -6,6 +6,7 @@ import { UserContext } from "../../controller/model/UserContext";
 import { ValidationError } from "../../controller/validation/Validator";
 import { Logger } from "../../logger/TotoLogger";
 import { KudDocGameStore, KudPO, KudStatus } from "../../store/KudDocGameStore";
+import { Game, GameStatus } from "../GameModel";
 
 const SCORE_PER_KUD = 20
 
@@ -16,21 +17,7 @@ const SCORE_PER_KUD = 20
  * The user just needs to upload the document. The document will then be parsed, and if valid, the user will be rewwarded with data quality points.
  * ---------------------
  */
-export class KuploadGame {
-
-    userEmail: string;
-    logger: Logger;
-    cid: string | undefined;
-    config: ControllerConfig;
-
-    constructor(userContext: UserContext, execContext: ExecutionContext) {
-
-        this.userEmail = userContext.email;
-        this.logger = execContext.logger;
-        this.cid = execContext.cid;
-        this.config = execContext.config as ControllerConfig;
-
-    }
+export class KuploadGame extends Game {
 
     /**
      * Returns the status of the game
@@ -309,10 +296,7 @@ export class KuploadGame {
 
 }
 
-export interface KuploadGameStatus {
-    score: number               // Current score for the user. Minimum is 0
-    maxScore: number            // Maximum achievable score
-    percCompletion: number      // Percentage of completion (expresssed as %, e.g. 50), rounded to 0 decimal places. Min is 0.
+export interface KuploadGameStatus extends GameStatus {
     missingKuds: MissingKud[]   // Array with the list of missing kuds
     numMissingKuds: number      // Number of missing kuds (length of the missingKuds array)
 }
