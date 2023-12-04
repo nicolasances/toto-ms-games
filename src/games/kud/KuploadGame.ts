@@ -19,6 +19,22 @@ const SCORE_PER_KUD = 20
  */
 export class KuploadGame extends Game {
 
+
+    /**
+     * To pass, the user needs the equivalent of 80% of the kud documents uploaded
+     */
+    pointsToPass(): number {
+
+        // Get the total amount of needed KUDs
+        const numNeededKuds = this.getFullKudsList().length;
+
+        // Calculate 80% of that and multiply to get the score
+        const scoreToPass = Math.floor(numNeededKuds * SCORE_PER_KUD * 0.8)
+
+        return scoreToPass;
+
+    }
+
     /**
      * Returns the status of the game
      */
