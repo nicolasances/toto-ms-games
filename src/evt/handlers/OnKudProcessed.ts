@@ -1,6 +1,6 @@
 import { ExecutionContext } from "../../controller/model/ExecutionContext";
 import { UserContext } from "../../controller/model/UserContext";
-import { KudDocGame } from "../../games/kud/KudDocGame";
+import { KuploadGame } from "../../games/kud/KuploadGame";
 import { AEventHandler, EventHandlingResult } from "../EventHanlder";
 import { TotoEvent } from "../TotoEvent";
 
@@ -24,7 +24,9 @@ export class OnKudProcessed extends AEventHandler {
         const kudId = msg.id
         const userEmail = msg.data.userEmail
 
-        await new KudDocGame(this.userContext, this.execContext).onKudProcessed(kudId, userEmail);
+        await new KuploadGame(this.userContext, this.execContext).onKudProcessed(kudId, userEmail);
+
+        this.execContext.logger.compute(this.execContext.cid, `Successfully processed kud [${kudId}] for user [${userEmail}]`)
 
         return { eventProcessed: true }
 
