@@ -86,6 +86,43 @@ export class KudDocGameStore {
     }
 
     /**
+     * Registers that a KUD document is missing for a given period of time
+     * @param userEmail the user email
+     * @param kudId the id of the missing kud
+     */
+    async onKudMissing(userEmail: string, kudId: string) {
+
+        const gameFilter = {
+            [f_email]: userEmail,
+            [f_gameId]: Games.kupload.id,
+        }
+
+        const clear = {
+            $pull: {
+                [f_kuds]: {
+                    [f_kud_id]: kudId
+                }
+            }
+        }
+
+        const update = {
+            $push: {
+                [f_kuds]: {
+                    [f_kud_id]: kudId,
+                    [f_kud_status]: KudStatus.missing
+                }
+            }
+        }
+
+        // Make sure to delete any previously inserted kud with the same kudId
+        await this.db.collection(this.config.getCollections().games).updateOne(gameFilter, clear, { upsert: true })
+
+        // Now recreate that kud
+        await this.db.collection(this.config.getCollections().games).updateOne(gameFilter, update, { upsert: true })
+
+    }
+
+    /**
      * Updates the status of a kud as specified
      * @param userEmail user email
      * @param kudId id of the uploaded Kud (remember kud Ids are in the format "kud-year-month")
@@ -129,4 +166,5 @@ export interface KudPO {
 export const KudStatus = {
     uploaded: "uploaded",
     processed: "processed",
+    missing: "missing", 
 }

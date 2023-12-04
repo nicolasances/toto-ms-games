@@ -7,6 +7,7 @@ import { GetMissingKudDocs } from "./dlg/games/kud/GetMissingKudDocs";
 import { KudEventHandlerHook } from "./evt/KudEventHandlerHook";
 import { GetKuploadGame } from "./dlg/games/kud/GetKuploadGame";
 import { GetGamesOverview } from "./dlg/GetGamesOverview";
+import { PostMissingKud } from "./dlg/games/kud/PostMissingKud";
 
 const api = new TotoAPIController("toto-ms-games", new ControllerConfig())
 
@@ -15,6 +16,7 @@ api.path("GET", "/games", new GetGamesOverview())
 
 api.path('GET', '/games/kupload', new GetKuploadGame())
 api.path("GET", "/games/kuddoc/missing", new GetMissingKudDocs())
+api.path("POST", "/games/kuddoc/missing", new PostMissingKud())
 api.fileUploadPath("/games/kuddoc/upload", new PostKudDocument())
 
 api.path('POST', '/events/kud', new KudEventHandlerHook())
