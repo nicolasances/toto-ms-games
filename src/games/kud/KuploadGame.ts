@@ -42,6 +42,8 @@ export class KuploadGame extends Game {
 
         let client;
 
+        this.logger.compute(this.cid, `Computing Kupload Game Status`)
+
         try {
 
             client = await this.config.getMongoClient();
@@ -66,10 +68,14 @@ export class KuploadGame extends Game {
             }
 
             // Get the missing kuds
-            const missingKuds = this.getMissingKudsFromCompletedKuds(gamePO.kuds, true);
+            const missingKuds = this.getMissingKudsFromCompletedKuds(gamePO.kuds, false);
 
-            // Calculate the current score
-            const score = gamePO.kuds ? gamePO.kuds.length * SCORE_PER_KUD : 0
+            // Calculate the current score, excluding MISSING ones
+            let score = 0;
+            
+            if (gamePO.kuds) {
+                for (let kud of gamePO.kuds) if (kud.status != KudStatus.missing) score += SCORE_PER_KUD;
+            }
 
             // Calculate the percentage of completion
             const completionPerc = Math.floor(100 * score / maxScore)
@@ -164,7 +170,12 @@ export class KuploadGame extends Game {
         for (let i = 0; i < completedKuds.length; i++) {
 
             // Check that the KUD has not been signaled as missing
-            if (excludeMissing && completedKuds[i].status == KudStatus.missing) continue;
+            if (excludeMissing && completedKuds[i].status == KudStatus.missing) {
+
+                this.logger.compute(this.cid, `Kud [${completedKuds[i].kudId}] is MISSING. Excluding.`)
+
+                continue;
+            }
 
             // Id Components will be arrays like ["kud", "2023", "03"]
             const kudIdComponents = completedKuds[i].kudId.split("-")
