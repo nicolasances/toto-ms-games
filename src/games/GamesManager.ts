@@ -11,11 +11,13 @@ export class GamesManager {
 
     userContext: UserContext;
     execContext: ExecutionContext;
+    authHeader: string;
 
-    constructor(userContext: UserContext, execContext: ExecutionContext) {
+    constructor(userContext: UserContext, execContext: ExecutionContext, authHeader: string) {
 
         this.userContext = userContext;
         this.execContext = execContext;
+        this.authHeader = authHeader;
 
     }
 
@@ -39,7 +41,7 @@ export class GamesManager {
             if (gameConstructor) {
 
                 // Instantiate the Game's Manager
-                const game = gameConstructor(this.userContext, this.execContext);
+                const game = gameConstructor(this.userContext, this.execContext, this.authHeader);
 
                 // Get the Game Status
                 const gameStatus = await game.getGameStatus();
@@ -74,7 +76,7 @@ export class GamesManager {
         const progress = this.getPlayerProgress(gameStatuses);
 
         // Level 0: FISHY
-        if (progress.score < new KuploadGame(this.userContext, this.execContext).pointsToPass()) return new PlayerLevel(PlayerLevels.fishy, progress);
+        if (progress.score < new KuploadGame(this.userContext, this.execContext, this.authHeader).pointsToPass()) return new PlayerLevel(PlayerLevels.fishy, progress);
 
         // Level 1: MONKEY
         return new PlayerLevel(PlayerLevels.monkey, progress);

@@ -8,6 +8,7 @@ import { TotoRuntimeError } from "../../../controller/model/TotoRuntimeError";
 import { Storage } from "@google-cloud/storage";
 import { EVENTS, EventPublisher } from "../../../evt/EventPublisher";
 import { KuploadGame, kudId } from "../../../games/kud/KuploadGame";
+import { extractAuthHeader } from "../../../util/AuthHeader";
 
 const storage = new Storage();
 
@@ -33,7 +34,7 @@ export class PostMissingKud implements TotoDelegate {
     if (!month) throw new ValidationError(400, "No Month provided");
 
     // Save the Game
-    await new KuploadGame(userContext, execContext).onKudMissing(kudId(parseInt(year), parseInt(month)), userContext.email)
+    await new KuploadGame(userContext, execContext, String(extractAuthHeader(req))).onKudMissing(kudId(parseInt(year), parseInt(month)), userContext.email)
 
     return { updated: true }
 

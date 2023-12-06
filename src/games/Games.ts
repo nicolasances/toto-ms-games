@@ -7,7 +7,7 @@ export const Games: IIndexable = {
     kupload: {
         id: "kupload",
         desc: "Upload all your DanskeBank Kontoudskrift Documents",
-        newManager: (userContext: UserContext, execContext: ExecutionContext) => { return new KuploadGame(userContext, execContext) }
+        newManager: (userContext: UserContext, execContext: ExecutionContext, authHeader: string) => { return new KuploadGame(userContext, execContext, authHeader) }
     },
     rekoncile: {
         id: "rekoncile",
