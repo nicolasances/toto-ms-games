@@ -1,6 +1,7 @@
 import http from 'request'
 import { ExecutionContext } from "../controller/model/ExecutionContext";
 import { UserContext } from "../controller/model/UserContext";
+import { TotoExpense } from './ExpensesAPI';
 
 export class KudAPI {
 
@@ -37,6 +38,37 @@ export class KudAPI {
 
             })
         })
+    }
+
+    async postReconciliation(kudTransaction: KudTransaction, totoExpense: TotoExpense) {
+
+        return new Promise((success, failure) => {
+
+            http({
+                uri: this.endpoint + `/reconciliations`,
+                method: 'POST',
+                headers: {
+                    'x-correlation-id': this.cid,
+                    'Authorization': this.authorizationHeader,
+                    'Content-Type' : "application/json",
+                }, 
+                body: JSON.stringify({
+                    kudPayment: kudTransaction, 
+                    totoTransaction: totoExpense
+                })
+            }, (err: any, resp: any, body: any) => {
+
+                if (err) {
+                    console.log(err)
+                    failure(err);
+                }
+                else success(JSON.parse(body));
+
+            })
+        })
+
+
+
     }
 }
 

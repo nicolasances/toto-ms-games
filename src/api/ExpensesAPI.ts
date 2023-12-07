@@ -38,6 +38,34 @@ export class ExpensesAPI {
             })
         })
     }
+
+    async consolidateExpense(expenseId: string) {
+
+        return new Promise((success, failure) => {
+
+            http({
+                uri: this.endpoint + `/expenses/${expenseId}`,
+                method: 'PUT',
+                headers: {
+                    'x-correlation-id': this.cid,
+                    'Authorization': this.authorizationHeader,
+                    'Content-Type': "application/json",
+                },
+                body: JSON.stringify({
+                    consolidated: true
+                })
+            }, (err: any, resp: any, body: any) => {
+
+                if (err) {
+                    console.log(err)
+                    failure(err);
+                }
+                else success({});
+
+            })
+        })
+
+    }
 }
 
 export interface GetExpensesResponse {
