@@ -40,6 +40,33 @@ export class KudAPI {
         })
     }
 
+    /**
+     * Counts the kud transactions (total, not just the non-reconciled)
+     * @returns Promise<CountKudTransactionsResponse> the count
+     */
+    async countKudTransactions(): Promise<CountKudTransactionsResponse> {
+
+        return new Promise((success, failure) => {
+
+            http({
+                uri: this.endpoint + `/transactions/count?user=${this.userEmail}`,
+                method: 'GET',
+                headers: {
+                    'x-correlation-id': this.cid,
+                    'Authorization': this.authorizationHeader
+                }
+            }, (err: any, resp: any, body: any) => {
+
+                if (err) {
+                    console.log(err)
+                    failure(err);
+                }
+                else success(JSON.parse(body));
+
+            })
+        })
+    }
+
     async postReconciliation(kudTransaction: KudTransaction, totoExpense: TotoExpense) {
 
         return new Promise((success, failure) => {
@@ -67,8 +94,33 @@ export class KudAPI {
             })
         })
 
+    }
 
+    /**
+     * Counts the reconciliations
+     * @returns Promise<CountReconciliationsResponse> the count
+     */
+    async countReconciliations(): Promise<CountReconciliationsResponse> {
 
+        return new Promise((success, failure) => {
+
+            http({
+                uri: this.endpoint + `/reconciliations/count?user=${this.userEmail}`,
+                method: 'GET',
+                headers: {
+                    'x-correlation-id': this.cid,
+                    'Authorization': this.authorizationHeader
+                }
+            }, (err: any, resp: any, body: any) => {
+
+                if (err) {
+                    console.log(err)
+                    failure(err);
+                }
+                else success(JSON.parse(body));
+
+            })
+        })
     }
 }
 
@@ -84,4 +136,11 @@ export interface KudTransaction {
     text: string,
     user: string,
     yearMonth: string
+}
+
+export interface CountKudTransactionsResponse {
+    count: number
+}
+export interface CountReconciliationsResponse {
+    reconciliationCount: number
 }

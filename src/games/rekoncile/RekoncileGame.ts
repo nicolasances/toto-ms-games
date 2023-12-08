@@ -1,15 +1,55 @@
-import moment from "moment-timezone";
+import moment, { max } from "moment-timezone";
 import { ExpensesAPI, TotoExpense } from "../../api/ExpensesAPI";
 import { KudAPI, KudTransaction } from "../../api/KudAPI";
 import { Game, GameStatus } from "../GameModel";
+import { extractAuthHeader } from "../../util/AuthHeader";
 
 const AMOUNT_TOLERANCE = 0.05;  // 5% difference
 const DATE_TOLERANCE = 5;       // 5 days ahead or behind are "OK"
 
+const SCORE_PER_RECONCILIATION = 5;
+
 export class RekoncileGame extends Game {
 
+    /**
+     * This method returns the Rekoncile Game Status
+     * 
+     * @returns Promise<GameStatus>
+     * 
+     * Scoring is calculated as follows: 
+     *  - The Kud API is called to retrieve the count of Reconciliation records for the user
+     *  - The Kud API is called to retrieve the count of Kud records for the user
+     *  - The Score is calculated as SCORE_PER_RECONCILIATION * num_of_reconciliation_records
+     *  - The Max Score is calculated as SCORE_PER_RECONCILIATION * num_of_kud_records
+     */
     async getGameStatus(): Promise<GameStatus> {
-        throw new Error("Method not implemented.");
+
+        const kudAPI = new KudAPI(this.userContext, this.execContext, this.authHeader)
+
+        // Count the number of Reconciliations
+        const { reconciliationCount } = await kudAPI.countReconciliations()
+
+        // Count the number of Transactions
+        const {count} = await kudAPI.countKudTransactions()
+    
+        // Check if score is 0
+        if (count == 0) return {
+            score: 0,
+            maxScore: 0, 
+            percCompletion: 0
+        }
+
+        // Calculate the score
+        const score = reconciliationCount * SCORE_PER_RECONCILIATION
+        const maxScore = count * SCORE_PER_RECONCILIATION
+        const percCompletion = (100 * score) / maxScore
+
+        return {
+            score: score, 
+            maxScore: maxScore, 
+            percCompletion: percCompletion
+        }
+
     }
 
     pointsToPass(): number {
@@ -57,7 +97,7 @@ export class RekoncileGame extends Game {
         }
 
         return {
-            kudPayment: kudPayment, 
+            kudPayment: kudPayment,
             candidates: candidates
         }
 
@@ -66,6 +106,6 @@ export class RekoncileGame extends Game {
 }
 
 export interface GetNextTransactionResponse {
-    kudPayment: KudTransaction, 
+    kudPayment: KudTransaction,
     candidates: TotoExpense[]
 }
