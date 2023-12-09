@@ -80,8 +80,8 @@ export class GamesManager {
         // Define levels
         const levels = [
             { level: PlayerLevels.fishy, minScore: 0, passScore: kuploadPointsToPass },
-            { level: PlayerLevels.monkey, minScore: kuploadPointsToPass, passScore: Math.floor(rekoncilePointsToPass / 2) },
-            { level: PlayerLevels.cake, minScore: Math.floor(rekoncilePointsToPass / 2), passScore: rekoncilePointsToPass }
+            { level: PlayerLevels.monkey, minScore: kuploadPointsToPass, passScore: kuploadPointsToPass + Math.floor(rekoncilePointsToPass / 2) },
+            { level: PlayerLevels.cake, minScore: kuploadPointsToPass + Math.floor(rekoncilePointsToPass / 2), passScore: rekoncilePointsToPass }
         ]
 
         // Get the player progress
