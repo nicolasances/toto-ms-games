@@ -90,11 +90,11 @@ export class GamesManager {
         // Get the right level
         for (let level of levels) {
 
-            if (progress.score >= level.minScore && progress.score < level.passScore) return new PlayerLevel(level.level, progress)
+            if (progress.score >= level.minScore && progress.score < level.passScore) return new PlayerLevel(level.level, progress, new LevelProgress(level.minScore, level.passScore))
 
         }
 
-        return new PlayerLevel(PlayerLevels.fishy, progress);
+        return new PlayerLevel(PlayerLevels.fishy, progress, new LevelProgress(0, 100000));
     }
 
     /**
@@ -160,14 +160,27 @@ interface PlayerProgress {
     percCompletion: number
 }
 
+class LevelProgress {
+    
+    minScore: number
+    passScore: number
+
+    constructor(minScore: number, passScore: number) {
+        this.minScore = minScore
+        this.passScore = passScore
+    }
+}
+
 export class PlayerLevel {
 
-    level: Level;
-    progress: PlayerProgress;
+    level: Level
+    progress: PlayerProgress
+    levelProgress: LevelProgress
 
-    constructor(level: Level, progress: PlayerProgress) {
+    constructor(level: Level, progress: PlayerProgress, levelProgress: LevelProgress) {
         this.level = level
         this.progress = progress;
+        this.levelProgress = levelProgress;
     }
 }
 
