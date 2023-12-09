@@ -71,7 +71,7 @@ export class RekoncileGame extends Game {
         
         // The payment is the one at index "roundsToSkip"
         // If roundsToSkip = 0 then you'll get the only payment, at position 0, otherwise you'll get the last payment in the returned array
-        if (response.payments.length == roundsToSkip) kudPayment = response.payments[roundsToSkip];
+        if (response.payments.length == roundsToSkip + 1) kudPayment = response.payments[roundsToSkip];
         // If there's not enough data, return the first available transaction
         else kudPayment = response.payments[0];
 
