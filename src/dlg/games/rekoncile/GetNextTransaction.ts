@@ -9,8 +9,11 @@ export class GetNextTransaction implements TotoDelegate {
 
     async do(req: Request, userContext: UserContext, execContext: ExecutionContext): Promise<any> {
 
+        // Are there rounds (transactions) to skip? 
+        const roundsToSkip = req.query.roundsToSkip ?? 0
+
         // Retrieve the next transaction to reconcile from the Rekoncile Game
-        const nextTransaction = await new RekoncileGame(userContext, execContext, String(extractAuthHeader(req))).getNextTransaction()
+        const nextTransaction = await new RekoncileGame(userContext, execContext, String(extractAuthHeader(req))).getNextTransaction(roundsToSkip)
 
         return nextTransaction;
 

@@ -17,12 +17,12 @@ export class KudAPI {
         this.authorizationHeader = authorizationHeader;
     }
 
-    async getUnreconciledTransaction(): Promise<GetKudTransactionsResponse> {
+    async getUnreconciledTransaction(skipTransactions?: number): Promise<GetKudTransactionsResponse> {
 
         return new Promise((success, failure) => {
 
             http({
-                uri: this.endpoint + `/transactions?user=${this.userEmail}&paymentsOnly=true&maxResults=1`,
+                uri: this.endpoint + `/transactions?user=${this.userEmail}&paymentsOnly=true&maxResults=1&skipTransactions=${skipTransactions}`,
                 method: 'GET',
                 headers: {
                     'x-correlation-id': this.cid,
