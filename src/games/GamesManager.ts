@@ -3,6 +3,7 @@ import { UserContext } from "../controller/model/UserContext";
 import { Game, GameStatus } from "./GameModel";
 import { Games } from "./Games";
 import { KuploadGame } from "./kud/KuploadGame";
+import { RekoncileGame } from "./rekoncile/RekoncileGame";
 
 /**
  * This class manages the overview of all Games
@@ -72,23 +73,28 @@ export class GamesManager {
      */
     getPlayerLevel(gameStatuses: SingleGameOverview[]): PlayerLevel {
 
+        // Gather points to pass
+        const kuploadPointsToPass = new KuploadGame(this.userContext, this.execContext, this.authHeader).pointsToPass();
+        const rekoncilePointsToPass = new RekoncileGame(this.userContext, this.execContext, this.authHeader).pointsToPass();
+
+        // Define levels
+        const levels = [
+            { level: PlayerLevels.fishy, minScore: 0, passScore: kuploadPointsToPass },
+            { level: PlayerLevels.monkey, minScore: kuploadPointsToPass, passScore: Math.floor(rekoncilePointsToPass / 2) },
+            { level: PlayerLevels.cake, minScore: Math.floor(rekoncilePointsToPass / 2), passScore: rekoncilePointsToPass }
+        ]
+
         // Get the player progress
         const progress = this.getPlayerProgress(gameStatuses);
 
-        // Level 0: FISHY
-        if (progress.score < new KuploadGame(this.userContext, this.execContext, this.authHeader).pointsToPass()) return new PlayerLevel(PlayerLevels.fishy, progress);
+        // Get the right level
+        for (let level of levels) {
 
-        // Level 1: MONKEY
-        return new PlayerLevel(PlayerLevels.monkey, progress);
+            if (progress.score >= level.minScore && progress.score < level.passScore) return new PlayerLevel(level.level, progress)
 
-        // Level 2: CAKE
+        }
 
-        // Level 3: BIRDIE
-
-        // Level 4: ROBOT
-
-        // Level 5: ROCKET
-
+        return new PlayerLevel(PlayerLevels.fishy, progress);
     }
 
     /**
@@ -129,11 +135,17 @@ export const PlayerLevels = {
         id: "monkey",
         title: "Monkey",
         desc: "A monkey could have been taking care of your data, for what I know. But it's a bit better than before! So keep paying that monkey to play games!",
+    } as Level,
+    cake: {
+        id: "cake",
+        title: "Cake",
+        desc: "Now your data smells good! A freshly baked cake! There is still a lot to do though, so don't stop playing!"
     } as Level
 }
 
 interface Level {
     id: string,
+    title: string,
     desc: string
 }
 
@@ -143,8 +155,8 @@ interface SingleGameOverview {
 }
 
 interface PlayerProgress {
-    score: number, 
-    maxScore: number, 
+    score: number,
+    maxScore: number,
     percCompletion: number
 }
 
