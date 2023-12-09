@@ -59,12 +59,22 @@ export class RekoncileGame extends Game {
     /**
      * Retrieves the next transaction to reconcile in the game
      */
-    async getNextTransaction(roundsToSkip?: number): Promise<GetNextTransactionResponse> {
+    async getNextTransaction(roundsToSkip: number): Promise<GetNextTransactionResponse | null> {
 
         // 1. Call the Kud API to retrieve a transaction
         const response = await new KudAPI(this.userContext, this.execContext, this.authHeader).getUnreconciledTransaction(roundsToSkip)
 
-        const kudPayment = response.payments[0];
+        // If there are no more payments available, you're done
+        if (response.payments.length == 0) return null;
+
+        let kudPayment;
+        
+        // The payment is the one at index "roundsToSkip"
+        // If roundsToSkip = 0 then you'll get the only payment, at position 0, otherwise you'll get the last payment in the returned array
+        if (response.payments.length == roundsToSkip) kudPayment = response.payments[roundsToSkip];
+        // If there's not enough data, return the first available transaction
+        else kudPayment = response.payments[0];
+
 
         // 2. Call the Expenses API to get all expenses in the same year-month
         const totoResponse = await new ExpensesAPI(this.userContext, this.execContext, this.authHeader).getExpenses(kudPayment.yearMonth);

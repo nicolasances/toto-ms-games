@@ -13,7 +13,7 @@ export class GetNextTransaction implements TotoDelegate {
         const roundsToSkip = req.query.roundsToSkip ?? 0
 
         // Retrieve the next transaction to reconcile from the Rekoncile Game
-        const nextTransaction = await new RekoncileGame(userContext, execContext, String(extractAuthHeader(req))).getNextTransaction(roundsToSkip)
+        const nextTransaction = await new RekoncileGame(userContext, execContext, String(extractAuthHeader(req))).getNextTransaction(parseInt(String(roundsToSkip)))
 
         return nextTransaction;
 

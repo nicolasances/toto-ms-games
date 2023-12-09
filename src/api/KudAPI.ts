@@ -17,12 +17,21 @@ export class KudAPI {
         this.authorizationHeader = authorizationHeader;
     }
 
-    async getUnreconciledTransaction(skipTransactions?: number): Promise<GetKudTransactionsResponse> {
+    /**
+     * Retrieves the next unreconciled transaction
+     * @param skipTransactions number of transactions to skip
+     * @returns 
+     */
+    async getUnreconciledTransaction(skipTransactions: number): Promise<GetKudTransactionsResponse> {
+
+        // Calculate the number of transactions to extract
+        // The number depends from skipTransactions: if skipTransactions > 0, then retrieve (1 + skipTransactions) transactions
+        const maxResults = skipTransactions + 1
 
         return new Promise((success, failure) => {
 
             http({
-                uri: this.endpoint + `/transactions?user=${this.userEmail}&paymentsOnly=true&maxResults=1&skipTransactions=${skipTransactions}`,
+                uri: this.endpoint + `/transactions?user=${this.userEmail}&paymentsOnly=true&maxResults=${maxResults}`,
                 method: 'GET',
                 headers: {
                     'x-correlation-id': this.cid,
