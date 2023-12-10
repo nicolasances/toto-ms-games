@@ -1,6 +1,7 @@
 import http from 'request'
 import { ExecutionContext } from "../controller/model/ExecutionContext";
 import { UserContext } from "../controller/model/UserContext";
+import moment from 'moment-timezone';
 
 export class ExpensesAPI {
 
@@ -66,23 +67,75 @@ export class ExpensesAPI {
         })
 
     }
+
+    /**
+     * POSTs the expense to the Expenses API
+     * 
+     * @param expense the expense to POST
+     * @returns an expense id
+     */
+    async postExpense(expense: TotoExpense): Promise<PostExpenseResult> {
+
+        return new Promise((success, failure) => {
+
+            http({
+                uri: this.endpoint + `/expenses`,
+                method: 'POST',
+                headers: {
+                    'x-correlation-id': this.cid,
+                    'Authorization': this.authorizationHeader,
+                    'Content-Type': "application/json",
+                },
+                body: JSON.stringify(expense)
+            }, (err: any, resp: any, body: any) => {
+
+                if (err) {
+                    console.log(err)
+                    failure(err);
+                }
+                else success(JSON.parse(body))
+
+            })
+        })
+
+    }
+}
+
+export interface PostExpenseResult {
+    id: string
 }
 
 export interface GetExpensesResponse {
     expenses: TotoExpense[]
 }
 
-export interface TotoExpense {
-    id: string,
-    amount: number,
-    amountInEuro: number,
-    category: string,
-    date: number,
-    description: string,
-    yearMonth: string,
-    consolidated: boolean,
-    currency: string,
-    user: string,
-    monthly: boolean,
-    tags?: string[]
+export class TotoExpense {
+
+    id?: string
+    amount: number
+    amountInEuro?: number
+    category?: string
+    date: string
+    description: string
+    yearMonth?: number
+    consolidated: boolean = false
+    currency: string
+    user: string
+    monthly: boolean = false
+    tags: string[] = []
+
+    constructor(amount: number, date: string, description: string, currency: string, user: string, category?: string) {
+
+        this.amount = amount
+        this.date = date
+        this.description = description
+        this.currency = currency
+        this.user = user
+
+        // Set the year month
+        this.yearMonth = parseInt(moment(date, "YYYYMMDD").format("YYYYMM"))
+
+    }
+
 }
+
