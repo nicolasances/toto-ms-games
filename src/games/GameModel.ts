@@ -32,13 +32,6 @@ export abstract class Game implements IGame {
 
     abstract getGameStatus(): Promise<GameStatus>
 
-    /**
-     * Specifies the number of points that the user needs to accumulate in order to achieve "good enough" quality
-     * and "pass". 
-     * 
-     * This is used for the general calculation of the player's progress
-     */
-    abstract pointsToPass(): number
 }
 
 export interface GameStatus {

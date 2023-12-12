@@ -73,15 +73,11 @@ export class GamesManager {
      */
     getPlayerLevel(gameStatuses: SingleGameOverview[]): PlayerLevel {
 
-        // Gather points to pass
-        const kuploadPointsToPass = new KuploadGame(this.userContext, this.execContext, this.authHeader).pointsToPass();
-        const rekoncilePointsToPass = new RekoncileGame(this.userContext, this.execContext, this.authHeader).pointsToPass();
-
         // Define levels
         const levels = [
-            { level: PlayerLevels.fishy, minScore: 0, passScore: kuploadPointsToPass },
-            { level: PlayerLevels.monkey, minScore: kuploadPointsToPass, passScore: kuploadPointsToPass + Math.floor(rekoncilePointsToPass / 2) },
-            { level: PlayerLevels.cake, minScore: kuploadPointsToPass + Math.floor(rekoncilePointsToPass / 2), passScore: kuploadPointsToPass + rekoncilePointsToPass }
+            { level: PlayerLevels.fishy, minScore: 0, passScore: 380 },
+            { level: PlayerLevels.monkey, minScore: 380, passScore: 1000 },
+            { level: PlayerLevels.cake, minScore: 1000, passScore: 3000 }, 
         ]
 
         // Get the player progress

@@ -52,10 +52,6 @@ export class RekoncileGame extends Game {
 
     }
 
-    pointsToPass(): number {
-        return 10000;
-    }
-
     /**
      * Retrieves the next transaction to reconcile in the game.
      * 
