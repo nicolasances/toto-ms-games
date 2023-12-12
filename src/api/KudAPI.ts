@@ -76,6 +76,34 @@ export class KudAPI {
         })
     }
 
+    /**
+     * Retrieves the reconciliations from the Kud API, for a given user and yearMonth
+     * 
+     * @param yearMonth the year month to consider
+     */
+    async getReconciliations(yearMonth: string): Promise<GetReconciliationsResponse> {
+
+        return new Promise((success, failure) => {
+
+            http({
+                uri: this.endpoint + `/reconciliations?user=${this.userEmail}&yearMonth=${yearMonth}`,
+                method: 'GET',
+                headers: {
+                    'x-correlation-id': this.cid,
+                    'Authorization': this.authorizationHeader
+                }
+            }, (err: any, resp: any, body: any) => {
+
+                if (err) {
+                    console.log(err)
+                    failure(err);
+                }
+                else success(JSON.parse(body));
+
+            })
+        })
+    }
+
     async postReconciliation(kudTransaction: KudTransaction, totoExpense: TotoExpense) {
 
         return new Promise((success, failure) => {
@@ -86,10 +114,10 @@ export class KudAPI {
                 headers: {
                     'x-correlation-id': this.cid,
                     'Authorization': this.authorizationHeader,
-                    'Content-Type' : "application/json",
-                }, 
+                    'Content-Type': "application/json",
+                },
                 body: JSON.stringify({
-                    kudPayment: kudTransaction, 
+                    kudPayment: kudTransaction,
                     totoTransaction: totoExpense
                 })
             }, (err: any, resp: any, body: any) => {
@@ -133,9 +161,6 @@ export class KudAPI {
     }
 }
 
-export interface GetKudTransactionsResponse {
-    payments: KudTransaction[]
-}
 
 export interface KudTransaction {
     amount: number,
@@ -147,6 +172,39 @@ export interface KudTransaction {
     yearMonth: string
 }
 
+export interface GetKudTransactionsResponse {
+    payments: KudTransaction[]
+}
+
+export interface ReconciliationKudPayment {
+    amount: number,
+    date: string,
+    id: string,
+    kudId: string,
+    text: string,
+    user: string,
+    year_month: string
+}
+export interface ReconciliationTotoExpense {
+    amount: number,
+    date: string,
+    id: string,
+    text: string,
+    year_month: number
+}
+/**
+ * Reconciliation as exposed by the Kud API
+ */
+export interface Reconciliation {
+
+    id: string, 
+    kud_payment: ReconciliationKudPayment, 
+    toto_expense: ReconciliationTotoExpense
+
+}
+export interface GetReconciliationsResponse {
+    reconciliations: Reconciliation[]
+}
 export interface CountKudTransactionsResponse {
     count: number
 }

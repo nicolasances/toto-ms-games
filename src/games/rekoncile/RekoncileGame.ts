@@ -1,6 +1,6 @@
 import moment, { max } from "moment-timezone";
 import { ExpensesAPI, TotoExpense } from "../../api/ExpensesAPI";
-import { KudAPI, KudTransaction } from "../../api/KudAPI";
+import { KudAPI, KudTransaction, Reconciliation, ReconciliationTotoExpense } from "../../api/KudAPI";
 import { Game, GameStatus } from "../GameModel";
 import { extractAuthHeader } from "../../util/AuthHeader";
 
@@ -30,12 +30,12 @@ export class RekoncileGame extends Game {
         const { reconciliationCount } = await kudAPI.countReconciliations()
 
         // Count the number of Transactions
-        const {count} = await kudAPI.countKudTransactions()
-    
+        const { count } = await kudAPI.countKudTransactions()
+
         // Check if score is 0
         if (count == 0) return {
             score: 0,
-            maxScore: 0, 
+            maxScore: 0,
             percCompletion: 0
         }
 
@@ -45,8 +45,8 @@ export class RekoncileGame extends Game {
         const percCompletion = (100 * score) / maxScore
 
         return {
-            score: score, 
-            maxScore: maxScore, 
+            score: score,
+            maxScore: maxScore,
             percCompletion: percCompletion
         }
 
@@ -57,7 +57,22 @@ export class RekoncileGame extends Game {
     }
 
     /**
-     * Retrieves the next transaction to reconcile in the game
+     * Retrieves the next transaction to reconcile in the game.
+     * 
+     * This method goes through these steps: 
+     * 
+     * 1.   Get the next transaction to reconcile from the Kud API. 
+     *      Skip some of the payments, if the user has passed on some transactions
+     * 
+     * 2.   Get the Toto Expenses for the year month
+     * 
+     * 3.   Retrieve the list of reconciliations for the current year month. 
+     *      Only the Toto Expense Ids are necessary. 
+     *      This is used to verify that candidates are not already part of a reconciliation in that month. 
+     * 
+     * 4.   Go through the Toto Expenses and keep good candidates (approximately matching amounts and date)
+     *      Exclude candidates that are already part of a reconciliation
+     * 
      */
     async getNextTransaction(roundsToSkip: number): Promise<GetNextTransactionResponse | null> {
 
@@ -68,7 +83,7 @@ export class RekoncileGame extends Game {
         if (response.payments.length == 0) return null;
 
         let kudPayment;
-        
+
         // The payment is the one at index "roundsToSkip"
         // If roundsToSkip = 0 then you'll get the only payment, at position 0, otherwise you'll get the last payment in the returned array
         if (response.payments.length == roundsToSkip + 1) kudPayment = response.payments[roundsToSkip];
@@ -81,10 +96,19 @@ export class RekoncileGame extends Game {
 
         const unfilteredExpenses = totoResponse.expenses;
 
-        // 3. Go through the expenses and find good candidates
+        // 3. Retrieve the list of reconciliations for the current year month, so that we can check that a candidate has not been already used
+        const { reconciliations } = await new KudAPI(this.userContext, this.execContext, this.authHeader).getReconciliations(kudPayment.yearMonth)
+
+        // Create a map of reconciliations, with the id of the toto expense as the key
+        const reconciliationsMap = reconciliations.map((reconciliation) => { return reconciliation.toto_expense.id })
+
+        // 4. Go through the expenses and find good candidates
         let candidates = []
 
         for (let totoExpense of unfilteredExpenses) {
+
+            // Exclude, if already reconciled
+            if (reconciliationsMap.includes(totoExpense.id!)) continue;
 
             // Calculate how "distant" the amount is, in percentage
             const amountDifference = Math.abs(totoExpense.amount - Math.abs(kudPayment.amount)) / totoExpense.amount;
