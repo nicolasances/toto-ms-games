@@ -102,8 +102,11 @@ export class KuploadGame extends Game {
         const startYear = 2018
         const startMonth = 3
 
-        const endYear = parseInt(moment().tz("Europe/Rome").format("YYYY"))
-        const endMonth = parseInt(moment().tz("Europe/Rome").format("MM"))
+        // Define when the list should end
+        // The list should end the month before the current (since as long as the month isn't finished, there is no Kud available from DB)
+        const endDate = moment().tz("Europe/Rome").add(-1, "months")
+        const endYear = parseInt(endDate.tz("Europe/Rome").format("YYYY"))
+        const endMonth = parseInt(endDate.tz("Europe/Rome").format("MM"))
 
         let curYear = startYear
         let curMonth = startMonth
