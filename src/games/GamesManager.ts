@@ -78,6 +78,8 @@ export class GamesManager {
             { level: PlayerLevels.fishy, minScore: 0, passScore: 380 },
             { level: PlayerLevels.monkey, minScore: 380, passScore: 1000 },
             { level: PlayerLevels.cake, minScore: 1000, passScore: 3000 }, 
+            { level: PlayerLevels.birdie, minScore: 3000, passScore: 7000 }, 
+            { level: PlayerLevels.robot, minScore: 7000, passScore: 18000 },
         ]
 
         // Get the player progress
@@ -136,6 +138,16 @@ export const PlayerLevels = {
         id: "cake",
         title: "Cake",
         desc: "Now your data smells good! A freshly baked cake! There is still a lot to do though, so don't stop playing!"
+    } as Level,
+    birdie: {
+        id: "birdie",
+        title: "Birdie",
+        desc: "You're flying high and have a good overview of the situation... and it's not bad at all! You've done a lot to get better quality data, go on!"
+    } as Level,
+    robot: {
+        id: "robot",
+        title: "Robot",
+        desc: "Everything looks like it has been fixed by some Superintelligent AI! Well done, the data quality is quite good! Care to go even higher?"
     } as Level
 }
 
