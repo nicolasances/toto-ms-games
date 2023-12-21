@@ -3,6 +3,7 @@ import { Game, GameStatus } from "../GameModel";
 import { ExpensesAPI } from "../../api/ExpensesAPI";
 import { CattieMonthPicker } from "./CattieMonthPicker";
 import { CattieRandomExpensePicker } from "./CattieRandomExpensePicker";
+import { ExpCatAPI } from "../../api/ExpCatAPI";
 
 export class CattieGame extends Game {
 
@@ -52,8 +53,17 @@ export class CattieGame extends Game {
             // Build the Cattie expense
             const chosenTx = new CattieTotoTx(chosenExpense.id!, chosenExpense.amount, chosenExpense.category!, chosenExpense.date, chosenExpense.description, chosenExpense.yearMonth!, chosenExpense.currency, chosenExpense.user)
 
-            // Get a suggestion
-            const suggestedCat = "VARIE"
+            // Get the category predictions from ExpCat
+            this.logger.compute(this.cid, `Getting a Category Prediction from ExpCat..`)
+
+            const { prediction } = await new ExpCatAPI(this.userContext, this.execContext, this.authHeader).predictCategory(chosenTx.description)
+
+            this.logger.compute(this.cid, `Getting a Category Prediction from ExpCat. Got ${JSON.stringify(prediction)}`)
+
+            // Suggested Category
+            let suggestedCat = "VARIE"
+
+            if (prediction && prediction.length > 0) suggestedCat = prediction[0];
 
             // Return the next rount 
             return new CattieRound(chosenTx, suggestedCat)
