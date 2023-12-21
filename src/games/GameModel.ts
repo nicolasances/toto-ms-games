@@ -14,17 +14,24 @@ export abstract class Game implements IGame {
     logger: Logger;
     cid: string | undefined;
     config: ControllerConfig;
+    userContext: UserContext;
+    execContext: ExecutionContext;
+    authHeader: string;
 
-    constructor(userContext: UserContext, execContext: ExecutionContext) {
+    constructor(userContext: UserContext, execContext: ExecutionContext, authHeader: string) {
 
         this.userEmail = userContext.email;
         this.logger = execContext.logger;
         this.cid = execContext.cid;
         this.config = execContext.config as ControllerConfig;
+        this.userContext = userContext;
+        this.execContext = execContext;
+        this.authHeader = authHeader;
 
     }
 
     abstract getGameStatus(): Promise<GameStatus>
+
 }
 
 export interface GameStatus {

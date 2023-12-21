@@ -26,6 +26,8 @@ export class KuploadGame extends Game {
 
         let client;
 
+        this.logger.compute(this.cid, `Computing Kupload Game Status`)
+
         try {
 
             client = await this.config.getMongoClient();
@@ -42,18 +44,22 @@ export class KuploadGame extends Game {
 
             // If there is no game yet, return 
             if (!gamePO) return {
-                score: 0, 
-                maxScore: maxScore, 
-                percCompletion: 0, 
-                missingKuds: fullKudList, 
+                score: 0,
+                maxScore: maxScore,
+                percCompletion: 0,
+                missingKuds: fullKudList,
                 numMissingKuds: fullKudList.length
             }
 
             // Get the missing kuds
-            const missingKuds = this.getMissingKudsFromCompletedKuds(gamePO.kuds);
+            const missingKuds = this.getMissingKudsFromCompletedKuds(gamePO.kuds, false);
 
-            // Calculate the current score
-            const score = gamePO.kuds ? gamePO.kuds.length * SCORE_PER_KUD : 0
+            // Calculate the current score, excluding MISSING ones
+            let score = 0;
+            
+            if (gamePO.kuds) {
+                for (let kud of gamePO.kuds) if (kud.status != KudStatus.missing) score += SCORE_PER_KUD;
+            }
 
             // Calculate the percentage of completion
             const completionPerc = Math.floor(100 * score / maxScore)
@@ -63,7 +69,7 @@ export class KuploadGame extends Game {
                 score: score,
                 maxScore: maxScore,
                 percCompletion: completionPerc,
-                missingKuds: missingKuds, 
+                missingKuds: missingKuds,
                 numMissingKuds: missingKuds ? missingKuds.length : 0
 
             }
@@ -96,8 +102,11 @@ export class KuploadGame extends Game {
         const startYear = 2018
         const startMonth = 3
 
-        const endYear = parseInt(moment().tz("Europe/Rome").format("YYYY"))
-        const endMonth = parseInt(moment().tz("Europe/Rome").format("MM"))
+        // Define when the list should end
+        // The list should end the month before the current (since as long as the month isn't finished, there is no Kud available from DB)
+        const endDate = moment().tz("Europe/Rome").add(-1, "months")
+        const endYear = parseInt(endDate.tz("Europe/Rome").format("YYYY"))
+        const endMonth = parseInt(endDate.tz("Europe/Rome").format("MM"))
 
         let curYear = startYear
         let curMonth = startMonth
@@ -130,8 +139,14 @@ export class KuploadGame extends Game {
     /**
      * Returns the list of kuds that the user should still upload
      * @param completedKuds a list of completed kuds (extracted from DB)
+     * @param excludeMissing pass true to exclude missing KUDs (a.k.a KUDs that the user has signalled as missing)
+     *      Excluding these KUDs makes sure that the user doesn't score higher just because it has signalled that
+     *      a KUD is missing. Missing KUDs are excluded from the score. 
+     *      This parameter should be mostly used when calculating score, not when calculating the list of KUDs that the 
+     *      user still has to upload (since missing KUDs have been signaled as such and it doesn't make sense to keep 
+     *      asking the user to upload them).
      */
-    getMissingKudsFromCompletedKuds(completedKuds: KudPO[]): MissingKud[] {
+    getMissingKudsFromCompletedKuds(completedKuds: KudPO[], excludeMissing: boolean = false): MissingKud[] {
 
         // Get the full list of kuds
         const fullKuds = this.getFullKudsList()
@@ -140,6 +155,14 @@ export class KuploadGame extends Game {
         let completedKudsMap = {} as any
 
         for (let i = 0; i < completedKuds.length; i++) {
+
+            // Check that the KUD has not been signaled as missing
+            if (excludeMissing && completedKuds[i].status == KudStatus.missing) {
+
+                this.logger.compute(this.cid, `Kud [${completedKuds[i].kudId}] is MISSING. Excluding.`)
+
+                continue;
+            }
 
             // Id Components will be arrays like ["kud", "2023", "03"]
             const kudIdComponents = completedKuds[i].kudId.split("-")
@@ -234,6 +257,45 @@ export class KuploadGame extends Game {
 
             // Update the kud game with a new kud uploaded
             await new KudDocGameStore(db, this.config).onKudUploaded(userEmail, kudId);
+
+
+        } catch (error) {
+
+            this.logger.compute(this.cid, `${error}`, "error")
+
+            if (error instanceof ValidationError || error instanceof TotoRuntimeError) {
+                throw error;
+            }
+            else {
+                console.log(error);
+                throw error;
+            }
+
+        }
+        finally {
+            if (client) client.close();
+        }
+
+    }
+
+    /**
+     * The user signals that a KUD document is missing and cannot be found anywhere 
+     * @param kudId the id of the missing kud
+     * @param userEmail the user email
+     */
+    async onKudMissing(kudId: string, userEmail: string) {
+
+        let client;
+
+        try {
+
+            client = await this.config.getMongoClient();
+            const db = client.db(this.config.getDBName());
+
+            this.logger.compute(this.cid, `Updating Game to register Kud Doc Missing`)
+
+            // Update the kud game with a new kud uploaded
+            await new KudDocGameStore(db, this.config).onKudMissing(userEmail, kudId);
 
 
         } catch (error) {

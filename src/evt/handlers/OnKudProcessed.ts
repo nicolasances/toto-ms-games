@@ -24,7 +24,7 @@ export class OnKudProcessed extends AEventHandler {
         const kudId = msg.id
         const userEmail = msg.data.userEmail
 
-        await new KuploadGame(this.userContext, this.execContext).onKudProcessed(kudId, userEmail);
+        await new KuploadGame(this.userContext, this.execContext, String()).onKudProcessed(kudId, userEmail);
 
         this.execContext.logger.compute(this.execContext.cid, `Successfully processed kud [${kudId}] for user [${userEmail}]`)
 

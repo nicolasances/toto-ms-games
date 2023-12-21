@@ -8,6 +8,7 @@ import { TotoRuntimeError } from "../../../controller/model/TotoRuntimeError";
 import { Storage } from "@google-cloud/storage";
 import { EVENTS, EventPublisher } from "../../../evt/EventPublisher";
 import { KuploadGame, kudId } from "../../../games/kud/KuploadGame";
+import { extractAuthHeader } from "../../../util/AuthHeader";
 
 const storage = new Storage();
 
@@ -21,7 +22,6 @@ export class PostKudDocument implements TotoDelegate {
 
     const logger = execContext.logger;
     const cid = execContext.cid;
-    const config = execContext.config as ControllerConfig;
 
     const gamesDataBucket = process.env.GAMES_DATA_BUCKET;
     const uploadFilepath = req.body.filepath;
@@ -35,12 +35,7 @@ export class PostKudDocument implements TotoDelegate {
     if (!year) throw new ValidationError(400, "No Year provided");
     if (!month) throw new ValidationError(400, "No Month provided");
 
-    let client;
-
     try {
-
-      client = await config.getMongoClient();
-      const db = client.db(config.getDBName());
 
       logger.compute(cid, `Kud will be stored to bucket [${gamesDataBucket}]`);
 
@@ -59,7 +54,7 @@ export class PostKudDocument implements TotoDelegate {
       await bucket.upload(uploadFilepath, { destination: filepath });
 
       // Save the Game
-      await new KuploadGame(userContext, execContext).onKudUploaded(kudId(parseInt(year), parseInt(month)), userContext.email)
+      await new KuploadGame(userContext, execContext, String(extractAuthHeader(req))).onKudUploaded(kudId(parseInt(year), parseInt(month)), userContext.email)
 
       // Publish event on pubsub
       await new EventPublisher(execContext, "games").publishEvent(filename, EVENTS.kudUploaded, `Kud ${filename} uploaded`, { gcsFilepath: filepath, gcsBucket: gamesDataBucket, year: year, month: month, user: userContext.email })
@@ -80,7 +75,6 @@ export class PostKudDocument implements TotoDelegate {
 
     }
     finally {
-      if (client) client.close();
     }
   }
 }

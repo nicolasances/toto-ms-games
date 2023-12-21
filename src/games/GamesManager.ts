@@ -2,6 +2,8 @@ import { ExecutionContext } from "../controller/model/ExecutionContext";
 import { UserContext } from "../controller/model/UserContext";
 import { Game, GameStatus } from "./GameModel";
 import { Games } from "./Games";
+import { KuploadGame } from "./kud/KuploadGame";
+import { RekoncileGame } from "./rekoncile/RekoncileGame";
 
 /**
  * This class manages the overview of all Games
@@ -10,11 +12,13 @@ export class GamesManager {
 
     userContext: UserContext;
     execContext: ExecutionContext;
+    authHeader: string;
 
-    constructor(userContext: UserContext, execContext: ExecutionContext) {
+    constructor(userContext: UserContext, execContext: ExecutionContext, authHeader: string) {
 
         this.userContext = userContext;
         this.execContext = execContext;
+        this.authHeader = authHeader;
 
     }
 
@@ -28,7 +32,7 @@ export class GamesManager {
     async getGamesOverview(): Promise<GamesOverview> {
 
         // Get the score from each game
-        const gameStatuses : SingleGameOverview[] = []
+        const gameStatuses: SingleGameOverview[] = []
 
         for (let gameKey of Object.keys(Games)) {
 
@@ -38,7 +42,7 @@ export class GamesManager {
             if (gameConstructor) {
 
                 // Instantiate the Game's Manager
-                const game = gameConstructor(this.userContext, this.execContext);
+                const game = gameConstructor(this.userContext, this.execContext, this.authHeader);
 
                 // Get the Game Status
                 const gameStatus = await game.getGameStatus();
@@ -56,7 +60,7 @@ export class GamesManager {
         const playerLevel = this.getPlayerLevel(gameStatuses)
 
         return {
-            playerLevel: playerLevel, 
+            playerLevel: playerLevel,
             gamesStatuses: gameStatuses
         }
 
@@ -69,39 +73,48 @@ export class GamesManager {
      */
     getPlayerLevel(gameStatuses: SingleGameOverview[]): PlayerLevel {
 
-        // Utility Function to retrieve a game's status
-        const findStatus = (gameKey: string, gameStatuses: SingleGameOverview[]) => {
-            for (let status of gameStatuses) {
-                if (status.gameKey == gameKey) return status;
-            }
-            return {
-                gameKey: gameKey,
-                gameStatus: {
-                    score: 0,
-                    maxScore: 1000000,
-                    percCompletion: 0
-                }
-            };
+        // Define levels
+        const levels = [
+            { level: PlayerLevels.fishy, minScore: 0, passScore: 380 },
+            { level: PlayerLevels.monkey, minScore: 380, passScore: 1000 },
+            { level: PlayerLevels.cake, minScore: 1000, passScore: 3000 }, 
+            { level: PlayerLevels.birdie, minScore: 3000, passScore: 7000 }, 
+            { level: PlayerLevels.robot, minScore: 7000, passScore: 18000 },
+        ]
+
+        // Get the player progress
+        const progress = this.getPlayerProgress(gameStatuses);
+
+        // Get the right level
+        for (let level of levels) {
+
+            if (progress.score >= level.minScore && progress.score < level.passScore) return new PlayerLevel(level.level, progress, new LevelPoints(level.minScore, level.passScore))
+
         }
 
-        // Extract statuses
-        const kuploadStatus = findStatus(Games.kupload.id, gameStatuses);
-        const rekoncileStatus = findStatus(Games.rekoncile.id, gameStatuses);
+        return new PlayerLevel(PlayerLevels.fishy, progress, new LevelPoints(0, 100000));
+    }
 
-        // Level 5: ROCKET
+    /**
+     * Calculates the player's overall progress as a "points" score
+     * 
+     * @param gameStatuses the list of every game's status
+     */
+    getPlayerProgress(gameStatuses: SingleGameOverview[]) {
 
-        // Level 4: ROBOT
+        let score = 0;
+        let maxScore = 0;
 
-        // Level 3: BIRDIE
+        for (let status of gameStatuses) {
 
-        // Level 2: CAKE
+            score += status.gameStatus.score;
+            maxScore += status.gameStatus.maxScore;
 
-        // Level 1: MONKEY
-        if (kuploadStatus.gameStatus.percCompletion >= 60 && 
-            rekoncileStatus.gameStatus.percCompletion < 20) return new PlayerLevel(PlayerLevels.monkey);
+        }
 
-        // Level 0: FISHY
-        return new PlayerLevel(PlayerLevels.fishy);
+        const percCompletion = (100 * score) / maxScore;
+
+        return { score: score, maxScore: maxScore, percCompletion: percCompletion }
 
     }
 
@@ -114,17 +127,33 @@ export const PlayerLevels = {
     fishy: {
         id: "fishy",
         title: "Fishy",
-        desc: "It stinks a bit.. Your data is underwater.. You get the point, you need to start playing games to clean it all up and get your data quality up!"
+        desc: "It stinks a bit.. Your data is underwater.. You get the point, you need to start playing games to clean it all up and get your data quality up!",
     } as Level,
     monkey: {
         id: "monkey",
         title: "Monkey",
-        desc: "A monkey could have been taking care of your data, for what I know. But it's a bit better than before! So keep paying that monkey to play games!"
+        desc: "A monkey could have been taking care of your data, for what I know. But it's a bit better than before! So keep paying that monkey to play games!",
+    } as Level,
+    cake: {
+        id: "cake",
+        title: "Cake",
+        desc: "Now your data smells good! A freshly baked cake! There is still a lot to do though, so don't stop playing!"
+    } as Level,
+    birdie: {
+        id: "birdie",
+        title: "Birdie",
+        desc: "You're flying high and have a good overview of the situation... and it's not bad at all! You've done a lot to get better quality data, go on!"
+    } as Level,
+    robot: {
+        id: "robot",
+        title: "Robot",
+        desc: "Everything looks like it has been fixed by some Superintelligent AI! Well done, the data quality is quite good! Care to go even higher?"
     } as Level
 }
 
 interface Level {
     id: string,
+    title: string,
     desc: string
 }
 
@@ -133,18 +162,39 @@ interface SingleGameOverview {
     gameStatus: GameStatus
 }
 
+interface PlayerProgress {
+    score: number,
+    maxScore: number,
+    percCompletion: number
+}
+
+class LevelPoints {
+    
+    minScore: number
+    passScore: number
+
+    constructor(minScore: number, passScore: number) {
+        this.minScore = minScore
+        this.passScore = passScore
+    }
+}
+
 export class PlayerLevel {
 
-    level: Level;
+    level: Level
+    progress: PlayerProgress
+    levelPoints: LevelPoints
 
-    constructor(level: Level) {
+    constructor(level: Level, progress: PlayerProgress, levelPoints: LevelPoints) {
         this.level = level
+        this.progress = progress;
+        this.levelPoints = levelPoints;
     }
 }
 
 interface GamesOverview {
 
-    playerLevel: PlayerLevel, 
+    playerLevel: PlayerLevel,
     gamesStatuses: SingleGameOverview[]
 
 }
