@@ -1,9 +1,12 @@
 import moment from "moment-timezone";
 import { Game, GameStatus } from "../GameModel";
-import { ExpensesAPI } from "../../api/ExpensesAPI";
+import { ExpensesAPI, TotoExpense } from "../../api/ExpensesAPI";
 import { CattieMonthPicker } from "./CattieMonthPicker";
 import { CattieRandomExpensePicker } from "./CattieRandomExpensePicker";
 import { ExpCatAPI } from "../../api/ExpCatAPI";
+import { CattieStore } from "../../store/CattieStore";
+import { ValidationError } from "../../controller/validation/Validator";
+import { TotoRuntimeError } from "../../controller/model/TotoRuntimeError";
 
 export class CattieGame extends Game {
 
@@ -13,7 +16,17 @@ export class CattieGame extends Game {
 
     /**
      * Loads the game's next round
+     * ---------------------------------------------
      * 
+     * The next round is loaded by picking randomly a yearMonth, and randomly picking 
+     * a Toto Expense in that yearMonth. 
+     * 
+     * It will also use the ExpCat Model API to predict the category of that expense. 
+     * 
+     * The user will then be allowed to chose between the expense category, the predicted category or 
+     * choose a category. 
+     * 
+     * @returns CattieRound 
      * 
      */
     async nextRound(): Promise<CattieRound> {
@@ -71,6 +84,64 @@ export class CattieGame extends Game {
         }
 
         return new CattieRound(undefined, undefined, true);
+    }
+
+    /**
+     * Reacts to a user picking a category
+     * ----------------------------------------------------------------------
+     * 
+     * This method can be called when a user has successfully picked 
+     * the category for the round's expense. 
+     * 
+     * This method will 
+     * - save the user's pick into DB
+     * - update the Toto Expense through the Expenses API
+     * 
+     * @param expense the Toto Expense that the user was presented with
+     * @param chosenCategory the category that the user has chosen
+     * 
+     */
+    async onCategoryPickedByUser(expense: TotoExpense, chosenCategory: string) {
+
+        let client;
+
+        try {
+
+            client = await this.config.getMongoClient();
+            const db = client.db(this.config.getDBName());
+
+            this.logger.compute(this.cid, `User chose category [${chosenCategory}] for expense [${expense.id!} - ${expense.description}]`)
+
+            // Save the user's picked category
+            const storeResult = await new CattieStore(db, this.config).saveCategoryPick(this.userEmail, expense, chosenCategory)
+
+            // Update the Expense on the Expenses API
+            await new ExpensesAPI(this.userContext, this.execContext, this.authHeader).updateExpenseCategory(expense.id!, chosenCategory)
+
+            this.logger.compute(this.cid, `User selection saved and sent to Expenses API`)
+
+            // Return 
+            return { insertedId: storeResult.insertedId }
+
+
+        } catch (error) {
+
+            this.logger.compute(this.cid, `${error}`, "error")
+
+            if (error instanceof ValidationError || error instanceof TotoRuntimeError) {
+                throw error;
+            }
+            else {
+                console.log(error);
+                throw error;
+            }
+
+        }
+        finally {
+            if (client) client.close();
+        }
+
+
     }
 }
 

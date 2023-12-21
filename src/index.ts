@@ -13,6 +13,7 @@ import { PostReconcilitation } from "./dlg/games/rekoncile/PostReconcilitation";
 import { GetRekoncileGame } from "./dlg/games/rekoncile/GetRekoncileGame";
 import { CreateTotoExpense } from "./dlg/games/rekoncile/CreateTotoExpense";
 import { GetNextCattieRound } from "./dlg/games/cattie/GetNextCattieRound";
+import { ChooseCategory } from "./dlg/games/cattie/ChooseCategory";
 
 const api = new TotoAPIController("toto-ms-games", new ControllerConfig())
 
@@ -30,6 +31,7 @@ api.path('POST', '/games/rekoncile/reconciliations', new PostReconcilitation())
 api.path('POST', '/games/rekoncile/expenses', new CreateTotoExpense())
 
 api.path('GET', '/games/cattie/next', new GetNextCattieRound())
+api.path('POST', '/games/cattie/selections', new ChooseCategory())
 
 api.path('POST', '/events/kud', new KudEventHandlerHook())
 

@@ -69,6 +69,40 @@ export class ExpensesAPI {
     }
 
     /**
+     * Updates the expense's category
+     * 
+     * @param expenseId the id of the expense to be updated
+     * @param category the new category
+     */
+    async updateExpenseCategory(expenseId: string, category: string) {
+
+        return new Promise((success, failure) => {
+
+            http({
+                uri: this.endpoint + `/expenses/${expenseId}`,
+                method: 'PUT',
+                headers: {
+                    'x-correlation-id': this.cid,
+                    'Authorization': this.authorizationHeader,
+                    'Content-Type': "application/json",
+                },
+                body: JSON.stringify({
+                    category: category
+                })
+            }, (err: any, resp: any, body: any) => {
+
+                if (err) {
+                    console.log(err)
+                    failure(err);
+                }
+                else success({});
+
+            })
+        })
+
+    }
+
+    /**
      * POSTs the expense to the Expenses API
      * 
      * @param expense the expense to POST
