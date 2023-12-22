@@ -35,19 +35,13 @@ export class RekoncileGame extends Game {
         // Check if score is 0
         if (count == 0) return {
             score: 0,
-            maxScore: 0,
-            percCompletion: 0
         }
 
         // Calculate the score
         const score = reconciliationCount * SCORE_PER_RECONCILIATION
-        const maxScore = count * SCORE_PER_RECONCILIATION
-        const percCompletion = (100 * score) / maxScore
 
         return {
             score: score,
-            maxScore: maxScore,
-            percCompletion: percCompletion
         }
 
     }

@@ -36,17 +36,12 @@ export class KuploadGame extends Game {
             // Get the full list of kuds that need to be stored
             const fullKudList = this.getFullKudsList()
 
-            // Calculate the max score
-            const maxScore = fullKudList.length * SCORE_PER_KUD
-
             // Retrieve the game info from DB
             const gamePO = await new KudDocGameStore(db, this.config).getGame(this.userEmail);
 
             // If there is no game yet, return 
             if (!gamePO) return {
                 score: 0,
-                maxScore: maxScore,
-                percCompletion: 0,
                 missingKuds: fullKudList,
                 numMissingKuds: fullKudList.length
             }
@@ -61,14 +56,9 @@ export class KuploadGame extends Game {
                 for (let kud of gamePO.kuds) if (kud.status != KudStatus.missing) score += SCORE_PER_KUD;
             }
 
-            // Calculate the percentage of completion
-            const completionPerc = Math.floor(100 * score / maxScore)
-
             // Return the data
             return {
                 score: score,
-                maxScore: maxScore,
-                percCompletion: completionPerc,
                 missingKuds: missingKuds,
                 numMissingKuds: missingKuds ? missingKuds.length : 0
 

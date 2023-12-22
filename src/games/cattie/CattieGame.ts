@@ -8,10 +8,46 @@ import { CattieStore } from "../../store/CattieStore";
 import { ValidationError } from "../../controller/validation/Validator";
 import { TotoRuntimeError } from "../../controller/model/TotoRuntimeError";
 
+const POINTS_PER_CATEGORY_PICKED = 10
+
 export class CattieGame extends Game {
 
-    getGameStatus(): Promise<GameStatus> {
-        throw new Error("Method not implemented.");
+    async getGameStatus(): Promise<GameStatus> {
+
+        let client;
+
+        try {
+
+            client = await this.config.getMongoClient();
+            const db = client.db(this.config.getDBName());
+
+            // Count the number of rounds the user played
+            const count = await new CattieStore(db, this.config).countCategoryPicks(this.userEmail)
+
+            // Calculate the score
+            const playerScore = count * POINTS_PER_CATEGORY_PICKED
+
+            // Return the status
+            return { score: playerScore }
+
+
+        } catch (error) {
+
+            this.logger.compute(this.cid, `${error}`, "error")
+
+            if (error instanceof ValidationError || error instanceof TotoRuntimeError) {
+                throw error;
+            }
+            else {
+                console.log(error);
+                throw error;
+            }
+
+        }
+        finally {
+            if (client) client.close();
+        }
+
     }
 
     /**

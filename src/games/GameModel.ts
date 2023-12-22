@@ -36,6 +36,4 @@ export abstract class Game implements IGame {
 
 export interface GameStatus {
     score: number               // Current score for the user. Minimum is 0
-    maxScore: number            // Maximum achievable score
-    percCompletion: number      // Percentage of completion (expresssed as %, e.g. 50), rounded to 0 decimal places. Min is 0.
 }

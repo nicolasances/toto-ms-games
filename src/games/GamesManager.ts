@@ -83,16 +83,16 @@ export class GamesManager {
         ]
 
         // Get the player progress
-        const progress = this.getPlayerProgress(gameStatuses);
+        const playerScore = this.getPlayerScore(gameStatuses);
 
         // Get the right level
         for (let level of levels) {
 
-            if (progress.score >= level.minScore && progress.score < level.passScore) return new PlayerLevel(level.level, progress, new LevelPoints(level.minScore, level.passScore))
+            if (playerScore.score >= level.minScore && playerScore.score < level.passScore) return new PlayerLevel(level.level, playerScore, new LevelPoints(level.minScore, level.passScore))
 
         }
 
-        return new PlayerLevel(PlayerLevels.fishy, progress, new LevelPoints(0, 100000));
+        return new PlayerLevel(PlayerLevels.fishy, playerScore, new LevelPoints(0, 100000));
     }
 
     /**
@@ -100,7 +100,7 @@ export class GamesManager {
      * 
      * @param gameStatuses the list of every game's status
      */
-    getPlayerProgress(gameStatuses: SingleGameOverview[]) {
+    getPlayerScore(gameStatuses: SingleGameOverview[]) {
 
         let score = 0;
         let maxScore = 0;
@@ -108,13 +108,10 @@ export class GamesManager {
         for (let status of gameStatuses) {
 
             score += status.gameStatus.score;
-            maxScore += status.gameStatus.maxScore;
 
         }
 
-        const percCompletion = (100 * score) / maxScore;
-
-        return { score: score, maxScore: maxScore, percCompletion: percCompletion }
+        return { score: score }
 
     }
 
@@ -162,10 +159,8 @@ interface SingleGameOverview {
     gameStatus: GameStatus
 }
 
-interface PlayerProgress {
+interface PlayerScore {
     score: number,
-    maxScore: number,
-    percCompletion: number
 }
 
 class LevelPoints {
@@ -182,10 +177,10 @@ class LevelPoints {
 export class PlayerLevel {
 
     level: Level
-    progress: PlayerProgress
+    progress: PlayerScore
     levelPoints: LevelPoints
 
-    constructor(level: Level, progress: PlayerProgress, levelPoints: LevelPoints) {
+    constructor(level: Level, progress: PlayerScore, levelPoints: LevelPoints) {
         this.level = level
         this.progress = progress;
         this.levelPoints = levelPoints;

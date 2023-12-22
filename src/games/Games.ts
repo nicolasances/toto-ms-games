@@ -1,6 +1,7 @@
 import { ExecutionContext } from "../controller/model/ExecutionContext";
 import { UserContext } from "../controller/model/UserContext";
 import { Game } from "./GameModel";
+import { CattieGame } from "./cattie/CattieGame";
 import { KuploadGame } from "./kud/KuploadGame";
 import { RekoncileGame } from "./rekoncile/RekoncileGame";
 
@@ -15,6 +16,11 @@ export const Games: IIndexable = {
         desc: "Reconcile all you DanskeBank Kontoudskrift payments with Toto payments", 
         newManager: (userContext: UserContext, execContext: ExecutionContext, authHeader: string) => { return new RekoncileGame(userContext, execContext, authHeader) }
     },
+    cattie: {
+        id: "cattie", 
+        desc: "Verify the categoy of your Toto Payments", 
+        newManager: (userContext: UserContext, execContext: ExecutionContext, authHeader: string) => { return new CattieGame(userContext, execContext, authHeader) }
+    }, 
     cashin: {
         id: "cashin",
         desc: "Register your incomes into Toto, month by month"

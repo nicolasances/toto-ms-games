@@ -24,6 +24,14 @@ export class CattieStore {
         this.config = config;
     }
 
+    /**
+     * Saves the user's pick
+     * 
+     * @param userEmail the user's email
+     * @param expense the toto expense that was proposed to the user in the Cattie game
+     * @param chosenCategory the category the user chose for that expense
+     * @returns the result of the insert
+     */
     async saveCategoryPick(userEmail: string, expense: TotoExpense, chosenCategory: string): Promise<SaveCategoryPickResult> {
 
         // Create the Cattie Record to save
@@ -34,6 +42,21 @@ export class CattieStore {
 
         // Return the insertion result 
         return { insertedId: result.insertedId.toHexString() }
+    }
+
+    /**
+     * Counts how many rounds the user played, i.e. how many categories the user picked
+     * 
+     * @param userEmail the user's email
+     */
+    async countCategoryPicks(userEmail: string): Promise<number> {
+
+        // Count the number of items for the user
+        const countResult = await this.db.collection(this.config.getCollections().cattie).count({ [f_user]: userEmail })
+
+        // Return the result
+        return countResult
+
     }
 
 }
