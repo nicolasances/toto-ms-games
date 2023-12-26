@@ -15,6 +15,7 @@ import { CreateTotoExpense } from "./dlg/games/rekoncile/CreateTotoExpense";
 import { GetNextCattieRound } from "./dlg/games/cattie/GetNextCattieRound";
 import { ChooseCategory } from "./dlg/games/cattie/ChooseCategory";
 import { GetCattieGameStatus } from "./dlg/games/cattie/GetCattieGameStatus";
+import { StartBackup } from "./dlg/backup/StartBackup";
 
 const api = new TotoAPIController("toto-ms-games", new ControllerConfig())
 
@@ -36,6 +37,8 @@ api.path('POST', '/games/cattie/selections', new ChooseCategory())
 api.path('GET', '/games/cattie', new GetCattieGameStatus())
 
 api.path('POST', '/events/kud', new KudEventHandlerHook())
+
+api.path('POST', '/backup', new StartBackup())
 
 api.init().then(() => {
     api.listen()
