@@ -24,9 +24,11 @@ export async function customAuthCheck(cid: string | string[] | undefined, author
             authProvider: result.authProvider
         }
 
-    } catch (error) {
+    } catch (error: any) {
 
         logger.compute(cid, "Invalid Authorization Token", "error")
+
+        if (error && error.code == 401) throw error
 
         throw { code: 401, message: `Invalid Authorization Token [${token}]` }
 

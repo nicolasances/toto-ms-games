@@ -1,5 +1,4 @@
-
-import { TotoAPIController } from "./controller/TotoAPIController";
+import { TotoAPIController } from "toto-api-controller";
 import { ControllerConfig } from "./Config";
 import { PostGame } from "./dlg/PostGame";
 import { PostKudDocument } from "./dlg/games/kud/PostKudDocument";

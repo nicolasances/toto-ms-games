@@ -10,6 +10,9 @@ export class GetGamesOverview implements TotoDelegate {
     
     async do(req: Request, userContext: UserContext, execContext: ExecutionContext): Promise<any> {
 
+        console.log(userContext);
+        
+
         // Get the Overview
         const overview = new GamesManager(userContext, execContext, String(extractAuthHeader(req))).getGamesOverview();
 

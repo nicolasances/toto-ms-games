@@ -20,8 +20,10 @@ export class TotoAuthProvider implements CustomAuthVerifier {
 
         const result = await verifyToken(this.authAPIEndpoint, idToken.idToken, null)
 
+
         if (!result || result.code == 400) throw result;
         if (result && result.name == 'JsonWebTokenError') throw {code: 400, message: result.message}
+        if (result && result.name == "TokenExpiredError") throw {code: 401, message: `JWT Token expired at ${result.expiredAt}`}
 
         console.log("Custom token successfully validated");
 
