@@ -75,9 +75,12 @@ export class GamesManager {
         const levels = [
             { level: PlayerLevels.fishy, minScore: 0, passScore: 380 },
             { level: PlayerLevels.monkey, minScore: 380, passScore: 1000 },
-            { level: PlayerLevels.cake, minScore: 1000, passScore: 3000 }, 
-            { level: PlayerLevels.birdie, minScore: 3000, passScore: 7000 }, 
+            { level: PlayerLevels.cake, minScore: 1000, passScore: 3000 },
+            { level: PlayerLevels.birdie, minScore: 3000, passScore: 7000 },
             { level: PlayerLevels.robot, minScore: 7000, passScore: 18000 },
+            { level: PlayerLevels.rocket, minScore: 18000, passScore: 30000 }, 
+            { level: PlayerLevels.galaxy, minScore: 30000, passScore: 50000 }, 
+            { level: PlayerLevels.heavenly, minScore: 50000, passScore: 100000 }, 
         ]
 
         // Get the player progress
@@ -143,7 +146,22 @@ export const PlayerLevels = {
         id: "robot",
         title: "Robot",
         desc: "Everything looks like it has been fixed by some Superintelligent AI! Well done, the data quality is quite good! Care to go even higher?"
-    } as Level
+    } as Level,
+    rocket: {
+        id: "rocket",
+        title: "Rocket",
+        desc: "Stars are your next stop! The high quality of your data is now quite impressive. You're going to have to sweat a bit to break the next barrier!"
+    },
+    galaxy: {
+        id: "galaxy",
+        title: "Galaxy",
+        desc: "Your data is now a perfect coherent Galaxy of brilliant stars! All seems to fit together perfectly. Can you make it any better?"
+    },
+    heavenly: {
+        id: "heavenly",
+        title: "Heavenly",
+        desc: "Your data is just... heavenly! Not a spot of dirt nor corruption! What can you do more? Maybe new data could flow in? Wow!"
+    }
 }
 
 interface Level {
@@ -162,7 +180,7 @@ interface PlayerScore {
 }
 
 class LevelPoints {
-    
+
     minScore: number
     passScore: number
 
