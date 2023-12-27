@@ -1,4 +1,4 @@
-import { ExecutionContext } from "../controller/model/ExecutionContext";
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
 import { TotoEvent } from "./TotoEvent";
 
 export abstract class AEventHandler {

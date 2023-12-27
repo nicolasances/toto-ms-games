@@ -1,9 +1,9 @@
 import { Request } from "express-serve-static-core";
-import { TotoDelegate } from "../../../controller/model/TotoDelegate";
-import { UserContext } from "../../../controller/model/UserContext";
-import { ExecutionContext } from "../../../controller/model/ExecutionContext";
 import { extractAuthHeader } from "../../../util/AuthHeader";
 import { CattieGame } from "../../../games/cattie/CattieGame";
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { TotoDelegate } from "toto-api-controller/dist/model/TotoDelegate";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
 
 /**
  * Retrieves information about the Cattie Game

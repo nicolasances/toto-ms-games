@@ -2,7 +2,6 @@ import moment, { max } from "moment-timezone";
 import { ExpensesAPI, TotoExpense } from "../../api/ExpensesAPI";
 import { KudAPI, KudTransaction, Reconciliation, ReconciliationTotoExpense } from "../../api/KudAPI";
 import { Game, GameStatus } from "../GameModel";
-import { extractAuthHeader } from "../../util/AuthHeader";
 
 const AMOUNT_TOLERANCE = 0.05;  // 5% difference
 const DATE_TOLERANCE = 5;       // 5 days ahead or behind are "OK"

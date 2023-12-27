@@ -1,6 +1,5 @@
 import { TotoAPIController } from "toto-api-controller";
 import { ControllerConfig } from "./Config";
-import { PostGame } from "./dlg/PostGame";
 import { PostKudDocument } from "./dlg/games/kud/PostKudDocument";
 import { GetMissingKudDocs } from "./dlg/games/kud/GetMissingKudDocs";
 import { KudEventHandlerHook } from "./evt/KudEventHandlerHook";
@@ -18,7 +17,6 @@ import { StartBackup } from "./dlg/backup/StartBackup";
 
 const api = new TotoAPIController("toto-ms-games", new ControllerConfig())
 
-api.path("POST", "/games", new PostGame())
 api.path("GET", "/games", new GetGamesOverview())
 
 api.path('GET', '/games/kupload', new GetKuploadGame())

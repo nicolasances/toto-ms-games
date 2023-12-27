@@ -1,9 +1,7 @@
-import { ExecutionContext } from "../controller/model/ExecutionContext";
-import { UserContext } from "../controller/model/UserContext";
 import { Game, GameStatus } from "./GameModel";
 import { Games } from "./Games";
-import { KuploadGame } from "./kud/KuploadGame";
-import { RekoncileGame } from "./rekoncile/RekoncileGame";
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
 
 /**
  * This class manages the overview of all Games

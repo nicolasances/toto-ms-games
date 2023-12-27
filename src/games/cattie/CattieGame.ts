@@ -5,8 +5,8 @@ import { CattieMonthPicker } from "./CattieMonthPicker";
 import { CattieRandomExpensePicker } from "./CattieRandomExpensePicker";
 import { ExpCatAPI } from "../../api/ExpCatAPI";
 import { CattieStore } from "../../store/CattieStore";
-import { ValidationError } from "../../controller/validation/Validator";
-import { TotoRuntimeError } from "../../controller/model/TotoRuntimeError";
+import { TotoRuntimeError } from "toto-api-controller/dist/model/TotoRuntimeError";
+import { ValidationError } from "toto-api-controller/dist/validation/Validator";
 
 const POINTS_PER_CATEGORY_PICKED = 10
 

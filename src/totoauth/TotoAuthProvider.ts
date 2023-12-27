@@ -1,5 +1,4 @@
-import { AuthCheckResult, CustomAuthVerifier, IdToken } from "../controller/model/CustomAuthVerifier";
-
+import { AuthCheckResult, CustomAuthVerifier, IdToken } from "toto-api-controller/dist/model/CustomAuthVerifier";
 const { verifyToken } = require('./api/AuthAPI');
 
 export class TotoAuthProvider implements CustomAuthVerifier {
@@ -19,7 +18,6 @@ export class TotoAuthProvider implements CustomAuthVerifier {
         console.log("Validating custom token");
 
         const result = await verifyToken(this.authAPIEndpoint, idToken.idToken, null)
-
 
         if (!result || result.code == 400) throw result;
         if (result && result.name == 'JsonWebTokenError') throw {code: 400, message: result.message}

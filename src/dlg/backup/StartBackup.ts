@@ -1,15 +1,15 @@
 import fs from 'fs'
 import { Request } from "express";
-import { ExecutionContext } from "../../controller/model/ExecutionContext";
-import { TotoDelegate } from "../../controller/model/TotoDelegate";
-import { UserContext } from "../../controller/model/UserContext";
 import { Storage } from "@google-cloud/storage";
-import { correlationId } from '../../controller/util/CorrelationId';
 import moment from "moment-timezone";
 import { ControllerConfig } from "../../Config";
-import { ValidationError } from '../../controller/validation/Validator';
-import { TotoRuntimeError } from '../../controller/model/TotoRuntimeError';
 import path from 'path';
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { TotoDelegate } from "toto-api-controller/dist/model/TotoDelegate";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
+import { TotoRuntimeError } from "toto-api-controller/dist/model/TotoRuntimeError";
+import { ValidationError } from "toto-api-controller/dist/validation/Validator";
+import { correlationId } from 'toto-api-controller/dist/util/CorrelationId';
 
 const storage = new Storage();
 

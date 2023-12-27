@@ -1,12 +1,11 @@
 import { Request } from "express";
-import { TotoDelegate } from "../../../controller/model/TotoDelegate";
-import { UserContext } from "../../../controller/model/UserContext";
-import { ExecutionContext } from "../../../controller/model/ExecutionContext";
-import { RekoncileGame } from "../../../games/rekoncile/RekoncileGame";
 import { extractAuthHeader } from "../../../util/AuthHeader";
 import { CattieGame } from "../../../games/cattie/CattieGame";
 import { TotoExpense } from "../../../api/ExpensesAPI";
-import { ValidationError } from "../../../controller/validation/Validator";
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { TotoDelegate } from "toto-api-controller/dist/model/TotoDelegate";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
+import { ValidationError } from "toto-api-controller/dist/validation/Validator";
 
 export class ChooseCategory implements TotoDelegate {
 

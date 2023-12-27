@@ -1,7 +1,7 @@
 import http from 'request'
-import { ExecutionContext } from "../controller/model/ExecutionContext";
-import { UserContext } from "../controller/model/UserContext";
 import { TotoExpense } from './ExpensesAPI';
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
 
 export class KudAPI {
 

@@ -1,9 +1,9 @@
-import { CustomAuthVerifier } from "./controller/model/CustomAuthVerifier";
-import { TotoControllerConfig } from "./controller/model/TotoControllerConfig";
-import { ValidatorProps } from "./controller/model/ValidatorProps";
 import { TotoAuthProvider } from "./totoauth/TotoAuthProvider";
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
+import { TotoControllerConfig } from "toto-api-controller/dist/model/TotoControllerConfig";
+import { CustomAuthVerifier } from "toto-api-controller/dist/model/CustomAuthVerifier";
+import { ValidatorProps } from "toto-api-controller/dist/model/ValidatorProps";
 
 const secretManagerClient = new SecretManagerServiceClient();
 

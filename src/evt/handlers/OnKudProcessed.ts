@@ -1,8 +1,8 @@
-import { ExecutionContext } from "../../controller/model/ExecutionContext";
-import { UserContext } from "../../controller/model/UserContext";
 import { KuploadGame } from "../../games/kud/KuploadGame";
 import { AEventHandler, EventHandlingResult } from "../EventHanlder";
 import { TotoEvent } from "../TotoEvent";
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
 
 /**
  * Handles "kudProcessed" events from toto-ms-kud microservice.

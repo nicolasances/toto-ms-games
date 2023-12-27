@@ -1,9 +1,8 @@
-import { ExecutionContext } from "../controller/model/ExecutionContext";
-import { UserContext } from "../controller/model/UserContext";
-import { Game } from "./GameModel";
 import { CattieGame } from "./cattie/CattieGame";
 import { KuploadGame } from "./kud/KuploadGame";
 import { RekoncileGame } from "./rekoncile/RekoncileGame";
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
 
 export const Games: IIndexable = {
     kupload: {

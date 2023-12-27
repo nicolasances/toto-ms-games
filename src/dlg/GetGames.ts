@@ -1,10 +1,11 @@
 import { Request } from "express";
-import { ExecutionContext } from "../controller/model/ExecutionContext";
-import { UserContext } from "../controller/model/UserContext";
-import { ValidationError } from "../controller/validation/Validator";
 import { ControllerConfig } from "../Config";
-import { TotoRuntimeError } from "../controller/model/TotoRuntimeError";
-import { TotoDelegate } from "../controller/model/TotoDelegate";
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { TotoDelegate } from "toto-api-controller/dist/model/TotoDelegate";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
+import { TotoRuntimeError } from "toto-api-controller/dist/model/TotoRuntimeError";
+import { ValidationError } from "toto-api-controller/dist/validation/Validator";
+
 export class GetGames implements TotoDelegate {
 
   async do(req: Request, userContext: UserContext, execContext: ExecutionContext): Promise<any> {
