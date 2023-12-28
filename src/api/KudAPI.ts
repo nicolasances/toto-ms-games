@@ -134,6 +134,40 @@ export class KudAPI {
     }
 
     /**
+     * Invalidates the specified Kud Transaction
+     * 
+     * @param kudTransactionId the id of the transaction to invalidate
+     * @returns 
+     */
+    async invalidateKudTransaction(kudTransactionId: string) {
+
+        return new Promise((success, failure) => {
+
+            http({
+                uri: this.endpoint + `/transactions/invalidate`,
+                method: 'POST',
+                headers: {
+                    'x-correlation-id': this.cid,
+                    'Authorization': this.authorizationHeader,
+                    'Content-Type': "application/json",
+                },
+                body: JSON.stringify({
+                    kudTransactionId: kudTransactionId
+                })
+            }, (err: any, resp: any, body: any) => {
+
+                if (err) {
+                    console.log(err)
+                    failure(err);
+                }
+                else success(JSON.parse(body));
+
+            })
+        })
+
+    }
+
+    /**
      * Counts the reconciliations
      * @returns Promise<CountReconciliationsResponse> the count
      */

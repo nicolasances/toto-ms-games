@@ -15,6 +15,7 @@ import { ChooseCategory } from "./dlg/games/cattie/ChooseCategory";
 import { GetCattieGameStatus } from "./dlg/games/cattie/GetCattieGameStatus";
 import { StartBackup } from "./dlg/backup/StartBackup";
 import { StartRestore } from "./dlg/backup/StartRestore";
+import { InvalidateKudTransaction } from "./dlg/games/rekoncile/InvalidateKudTransaction";
 
 const api = new TotoAPIController("toto-ms-games", new ControllerConfig())
 
@@ -28,6 +29,7 @@ api.fileUploadPath("/games/kuddoc/upload", new PostKudDocument())
 api.path('GET', '/games/rekoncile', new GetRekoncileGame())
 api.path('GET', '/games/rekoncile/next', new GetNextTransaction())
 api.path('POST', '/games/rekoncile/reconciliations', new PostReconcilitation())
+api.path('POST', '/games/rekoncile/invalidate', new InvalidateKudTransaction())
 api.path('POST', '/games/rekoncile/expenses', new CreateTotoExpense())
 
 api.path('GET', '/games/cattie/next', new GetNextCattieRound())
