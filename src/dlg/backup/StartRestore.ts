@@ -154,7 +154,7 @@ async function restoreCollection(db: Db, bucket: Bucket, collection: string, dat
 
         count++;
 
-        if (count % 200 == 0) {
+        if (count % 300 == 0) {
 
             // Save the batch of documents
             await db.collection(collection).insertMany(batch)
