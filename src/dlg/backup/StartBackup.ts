@@ -51,7 +51,7 @@ export class StartBackup implements TotoDelegate {
 
                     const doc = await cursor.next();
 
-                    fs.appendFileSync(filename, JSON.stringify(doc));
+                    fs.appendFileSync(filename, `${JSON.stringify(doc)}\n`);
 
                 }
 
