@@ -1,14 +1,13 @@
 import { Request } from "express";
-import { TotoDelegate } from "../../../controller/model/TotoDelegate";
-import { UserContext } from "../../../controller/model/UserContext";
-import { ExecutionContext } from "../../../controller/model/ExecutionContext";
-import { ControllerConfig } from "../../../Config";
-import { ValidationError } from "../../../controller/validation/Validator";
-import { TotoRuntimeError } from "../../../controller/model/TotoRuntimeError";
 import { Storage } from "@google-cloud/storage";
 import { EVENTS, EventPublisher } from "../../../evt/EventPublisher";
 import { KuploadGame, kudId } from "../../../games/kud/KuploadGame";
 import { extractAuthHeader } from "../../../util/AuthHeader";
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { TotoDelegate } from "toto-api-controller/dist/model/TotoDelegate";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
+import { TotoRuntimeError } from "toto-api-controller/dist/model/TotoRuntimeError";
+import { ValidationError } from "toto-api-controller/dist/validation/Validator";
 
 const storage = new Storage();
 

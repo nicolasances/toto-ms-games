@@ -1,7 +1,7 @@
 import { PubSub, Topic } from "@google-cloud/pubsub";
 import moment from "moment";
-import { ExecutionContext } from "../controller/model/ExecutionContext";
 import { ControllerConfig } from "../Config";
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
 
 const pubsub = new PubSub({ projectId: process.env.GCP_PID });
 

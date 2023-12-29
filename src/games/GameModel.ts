@@ -1,7 +1,7 @@
 import { ControllerConfig } from "../Config";
-import { ExecutionContext } from "../controller/model/ExecutionContext";
-import { UserContext } from "../controller/model/UserContext";
 import { Logger } from "../logger/TotoLogger";
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
 
 export interface IGame {}
 
@@ -36,6 +36,4 @@ export abstract class Game implements IGame {
 
 export interface GameStatus {
     score: number               // Current score for the user. Minimum is 0
-    maxScore: number            // Maximum achievable score
-    percCompletion: number      // Percentage of completion (expresssed as %, e.g. 50), rounded to 0 decimal places. Min is 0.
 }

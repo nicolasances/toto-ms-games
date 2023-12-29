@@ -1,7 +1,7 @@
 import http from 'request'
-import { ExecutionContext } from "../controller/model/ExecutionContext";
-import { UserContext } from "../controller/model/UserContext";
 import { TotoExpense } from './ExpensesAPI';
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
 
 export class KudAPI {
 
@@ -119,6 +119,40 @@ export class KudAPI {
                 body: JSON.stringify({
                     kudPayment: kudTransaction,
                     totoTransaction: totoExpense
+                })
+            }, (err: any, resp: any, body: any) => {
+
+                if (err) {
+                    console.log(err)
+                    failure(err);
+                }
+                else success(JSON.parse(body));
+
+            })
+        })
+
+    }
+
+    /**
+     * Invalidates the specified Kud Transaction
+     * 
+     * @param kudTransactionId the id of the transaction to invalidate
+     * @returns 
+     */
+    async invalidateKudTransaction(kudTransactionId: string) {
+
+        return new Promise((success, failure) => {
+
+            http({
+                uri: this.endpoint + `/transactions/invalidate`,
+                method: 'POST',
+                headers: {
+                    'x-correlation-id': this.cid,
+                    'Authorization': this.authorizationHeader,
+                    'Content-Type': "application/json",
+                },
+                body: JSON.stringify({
+                    kudTransactionId: kudTransactionId
                 })
             }, (err: any, resp: any, body: any) => {
 

@@ -1,9 +1,9 @@
 import { Request } from "express";
-import { TotoDelegate } from "../../../controller/model/TotoDelegate";
-import { UserContext } from "../../../controller/model/UserContext";
-import { ExecutionContext } from "../../../controller/model/ExecutionContext";
 import { RekoncileGame } from "../../../games/rekoncile/RekoncileGame";
 import { extractAuthHeader } from "../../../util/AuthHeader";
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { TotoDelegate } from "toto-api-controller/dist/model/TotoDelegate";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
 
 export class GetNextTransaction implements TotoDelegate {
 

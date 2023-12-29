@@ -1,13 +1,10 @@
 import { Request } from "express";
-import { ParamsDictionary } from "express-serve-static-core";
-import { ParsedQs } from "qs";
-import { ExecutionContext } from "../controller/model/ExecutionContext";
-import { FakeRequest, TotoDelegate } from "../controller/model/TotoDelegate";
-import { UserContext } from "../controller/model/UserContext";
 import { TotoEvent } from "./TotoEvent";
 import { AEventHandler } from "./EventHanlder";
-import { EVENTS } from "./EventPublisher";
 import { OnKudProcessed } from "./handlers/OnKudProcessed";
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { TotoDelegate } from "toto-api-controller/dist/model/TotoDelegate";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
 
 export class KudEventHandlerHook implements TotoDelegate {
 

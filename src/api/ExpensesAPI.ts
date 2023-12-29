@@ -1,7 +1,7 @@
 import http from 'request'
-import { ExecutionContext } from "../controller/model/ExecutionContext";
-import { UserContext } from "../controller/model/UserContext";
 import moment from 'moment-timezone';
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
 
 export class ExpensesAPI {
 
@@ -54,6 +54,40 @@ export class ExpensesAPI {
                 },
                 body: JSON.stringify({
                     consolidated: true
+                })
+            }, (err: any, resp: any, body: any) => {
+
+                if (err) {
+                    console.log(err)
+                    failure(err);
+                }
+                else success({});
+
+            })
+        })
+
+    }
+
+    /**
+     * Updates the expense's category
+     * 
+     * @param expenseId the id of the expense to be updated
+     * @param category the new category
+     */
+    async updateExpenseCategory(expenseId: string, category: string) {
+
+        return new Promise((success, failure) => {
+
+            http({
+                uri: this.endpoint + `/expenses/${expenseId}`,
+                method: 'PUT',
+                headers: {
+                    'x-correlation-id': this.cid,
+                    'Authorization': this.authorizationHeader,
+                    'Content-Type': "application/json",
+                },
+                body: JSON.stringify({
+                    category: category
                 })
             }, (err: any, resp: any, body: any) => {
 

@@ -1,9 +1,9 @@
 import { Request } from "express-serve-static-core";
-import { TotoDelegate } from "../../../controller/model/TotoDelegate";
-import { UserContext } from "../../../controller/model/UserContext";
-import { ExecutionContext } from "../../../controller/model/ExecutionContext";
 import { extractAuthHeader } from "../../../util/AuthHeader";
 import { RekoncileGame } from "../../../games/rekoncile/RekoncileGame";
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { TotoDelegate } from "toto-api-controller/dist/model/TotoDelegate";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
 
 /**
  * Retrieves information about the Rekoncile Game

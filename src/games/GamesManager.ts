@@ -1,9 +1,7 @@
-import { ExecutionContext } from "../controller/model/ExecutionContext";
-import { UserContext } from "../controller/model/UserContext";
 import { Game, GameStatus } from "./GameModel";
 import { Games } from "./Games";
-import { KuploadGame } from "./kud/KuploadGame";
-import { RekoncileGame } from "./rekoncile/RekoncileGame";
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
 
 /**
  * This class manages the overview of all Games
@@ -77,22 +75,25 @@ export class GamesManager {
         const levels = [
             { level: PlayerLevels.fishy, minScore: 0, passScore: 380 },
             { level: PlayerLevels.monkey, minScore: 380, passScore: 1000 },
-            { level: PlayerLevels.cake, minScore: 1000, passScore: 3000 }, 
-            { level: PlayerLevels.birdie, minScore: 3000, passScore: 7000 }, 
+            { level: PlayerLevels.cake, minScore: 1000, passScore: 3000 },
+            { level: PlayerLevels.birdie, minScore: 3000, passScore: 7000 },
             { level: PlayerLevels.robot, minScore: 7000, passScore: 18000 },
+            { level: PlayerLevels.rocket, minScore: 18000, passScore: 30000 }, 
+            { level: PlayerLevels.galaxy, minScore: 30000, passScore: 50000 }, 
+            { level: PlayerLevels.heavenly, minScore: 50000, passScore: 100000 }, 
         ]
 
         // Get the player progress
-        const progress = this.getPlayerProgress(gameStatuses);
+        const playerScore = this.getPlayerScore(gameStatuses);
 
         // Get the right level
         for (let level of levels) {
 
-            if (progress.score >= level.minScore && progress.score < level.passScore) return new PlayerLevel(level.level, progress, new LevelPoints(level.minScore, level.passScore))
+            if (playerScore.score >= level.minScore && playerScore.score < level.passScore) return new PlayerLevel(level.level, playerScore, new LevelPoints(level.minScore, level.passScore))
 
         }
 
-        return new PlayerLevel(PlayerLevels.fishy, progress, new LevelPoints(0, 100000));
+        return new PlayerLevel(PlayerLevels.fishy, playerScore, new LevelPoints(0, 100000));
     }
 
     /**
@@ -100,7 +101,7 @@ export class GamesManager {
      * 
      * @param gameStatuses the list of every game's status
      */
-    getPlayerProgress(gameStatuses: SingleGameOverview[]) {
+    getPlayerScore(gameStatuses: SingleGameOverview[]) {
 
         let score = 0;
         let maxScore = 0;
@@ -108,13 +109,10 @@ export class GamesManager {
         for (let status of gameStatuses) {
 
             score += status.gameStatus.score;
-            maxScore += status.gameStatus.maxScore;
 
         }
 
-        const percCompletion = (100 * score) / maxScore;
-
-        return { score: score, maxScore: maxScore, percCompletion: percCompletion }
+        return { score: score }
 
     }
 
@@ -148,7 +146,22 @@ export const PlayerLevels = {
         id: "robot",
         title: "Robot",
         desc: "Everything looks like it has been fixed by some Superintelligent AI! Well done, the data quality is quite good! Care to go even higher?"
-    } as Level
+    } as Level,
+    rocket: {
+        id: "rocket",
+        title: "Rocket",
+        desc: "Stars are your next stop! The high quality of your data is now quite impressive. You're going to have to sweat a bit to break the next barrier!"
+    },
+    galaxy: {
+        id: "galaxy",
+        title: "Galaxy",
+        desc: "Your data is now a perfect coherent Galaxy of brilliant stars! All seems to fit together perfectly. Can you make it any better?"
+    },
+    heavenly: {
+        id: "heavenly",
+        title: "Heavenly",
+        desc: "Your data is just... heavenly! Not a spot of dirt nor corruption! What can you do more? Maybe new data could flow in? Wow!"
+    }
 }
 
 interface Level {
@@ -162,14 +175,12 @@ interface SingleGameOverview {
     gameStatus: GameStatus
 }
 
-interface PlayerProgress {
+interface PlayerScore {
     score: number,
-    maxScore: number,
-    percCompletion: number
 }
 
 class LevelPoints {
-    
+
     minScore: number
     passScore: number
 
@@ -182,10 +193,10 @@ class LevelPoints {
 export class PlayerLevel {
 
     level: Level
-    progress: PlayerProgress
+    progress: PlayerScore
     levelPoints: LevelPoints
 
-    constructor(level: Level, progress: PlayerProgress, levelPoints: LevelPoints) {
+    constructor(level: Level, progress: PlayerScore, levelPoints: LevelPoints) {
         this.level = level
         this.progress = progress;
         this.levelPoints = levelPoints;

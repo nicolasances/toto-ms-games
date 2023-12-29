@@ -1,12 +1,8 @@
 import moment from "moment-timezone";
-import { ControllerConfig } from "../../Config";
-import { ExecutionContext } from "../../controller/model/ExecutionContext";
-import { TotoRuntimeError } from "../../controller/model/TotoRuntimeError";
-import { UserContext } from "../../controller/model/UserContext";
-import { ValidationError } from "../../controller/validation/Validator";
-import { Logger } from "../../logger/TotoLogger";
 import { KudDocGameStore, KudPO, KudStatus } from "../../store/KudDocGameStore";
 import { Game, GameStatus } from "../GameModel";
+import { TotoRuntimeError } from "toto-api-controller/dist/model/TotoRuntimeError";
+import { ValidationError } from "toto-api-controller/dist/validation/Validator";
 
 const SCORE_PER_KUD = 20
 
@@ -36,17 +32,12 @@ export class KuploadGame extends Game {
             // Get the full list of kuds that need to be stored
             const fullKudList = this.getFullKudsList()
 
-            // Calculate the max score
-            const maxScore = fullKudList.length * SCORE_PER_KUD
-
             // Retrieve the game info from DB
             const gamePO = await new KudDocGameStore(db, this.config).getGame(this.userEmail);
 
             // If there is no game yet, return 
             if (!gamePO) return {
                 score: 0,
-                maxScore: maxScore,
-                percCompletion: 0,
                 missingKuds: fullKudList,
                 numMissingKuds: fullKudList.length
             }
@@ -61,14 +52,9 @@ export class KuploadGame extends Game {
                 for (let kud of gamePO.kuds) if (kud.status != KudStatus.missing) score += SCORE_PER_KUD;
             }
 
-            // Calculate the percentage of completion
-            const completionPerc = Math.floor(100 * score / maxScore)
-
             // Return the data
             return {
                 score: score,
-                maxScore: maxScore,
-                percCompletion: completionPerc,
                 missingKuds: missingKuds,
                 numMissingKuds: missingKuds ? missingKuds.length : 0
 
