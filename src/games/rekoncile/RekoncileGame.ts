@@ -28,20 +28,34 @@ export class RekoncileGame extends Game {
         // Count the number of Reconciliations
         const { reconciliationCount } = await kudAPI.countReconciliations()
 
-        // Count the number of Transactions
-        const { count } = await kudAPI.countKudTransactions()
-
-        // Check if score is 0
-        if (count == 0) return {
-            score: 0,
-        }
-
         // Calculate the score
         const score = reconciliationCount * SCORE_PER_RECONCILIATION
 
+        // Calculate if the game is finished (even temporarily)
+        const gameFinished = await this.isGameFinished()
+
         return {
             score: score,
+            finished: gameFinished
         }
+
+    }
+
+    /**
+     * Defines if the game is finished (even temporarily). 
+     * 
+     * This is done by:
+     * 1. Checking the number of unreconciled transactions on the Kud API. If there are any, the game is not finished.
+     */
+    async isGameFinished(): Promise<boolean> {
+
+        // Get the next transaction to reconcile
+        const response = await new KudAPI(this.userContext, this.execContext, this.authHeader).getUnreconciledTransaction(0)
+
+        // Check if there are no more unreconciled transactions
+        if (response == null || response.payments == null || response.payments.length == 0) return true;
+
+        return false;
 
     }
 
