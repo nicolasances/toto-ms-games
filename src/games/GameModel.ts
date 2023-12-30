@@ -36,4 +36,5 @@ export abstract class Game implements IGame {
 
 export interface GameStatus {
     score: number               // Current score for the user. Minimum is 0
+    finished: boolean           // Define if the game is finished (event temporarily)
 }
