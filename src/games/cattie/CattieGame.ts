@@ -28,7 +28,10 @@ export class CattieGame extends Game {
             const playerScore = count * POINTS_PER_CATEGORY_PICKED
 
             // Return the status
-            return { score: playerScore }
+            return { 
+                score: playerScore, 
+                finished: this.isGameFinished()
+            }
 
 
         } catch (error) {
@@ -47,6 +50,17 @@ export class CattieGame extends Game {
         finally {
             if (client) client.close();
         }
+
+    }
+
+    /**
+     * Decides if the game is finished. 
+     * 
+     * For now, the Cattie game will NEVER be finished
+     */
+    isGameFinished() {
+
+        return false;
 
     }
 
