@@ -39,7 +39,8 @@ export class KuploadGame extends Game {
             if (!gamePO) return {
                 score: 0,
                 missingKuds: fullKudList,
-                numMissingKuds: fullKudList.length
+                numMissingKuds: fullKudList.length, 
+                finished: false
             }
 
             // Get the missing kuds
@@ -52,12 +53,15 @@ export class KuploadGame extends Game {
                 for (let kud of gamePO.kuds) if (kud.status != KudStatus.missing) score += SCORE_PER_KUD;
             }
 
+            // Define if the game is finished
+            const gameFinished = this.isGameFinished(missingKuds)
+
             // Return the data
             return {
                 score: score,
                 missingKuds: missingKuds,
-                numMissingKuds: missingKuds ? missingKuds.length : 0
-
+                numMissingKuds: missingKuds ? missingKuds.length : 0,
+                finished: gameFinished
             }
 
         } catch (error) {
@@ -76,6 +80,21 @@ export class KuploadGame extends Game {
         finally {
             if (client) client.close();
         }
+
+    }
+
+    /**
+     * States if the game is finished. 
+     * 
+     * Note that "finished" applies even if the game is TEMPORARILY finished (e.g. all the Kuds have been uploaded for now). 
+     * Some new kuds will periodically be needed, so the status of the game will, approximately every 3 months go back to "not finished".
+     * 
+     * To define if the game is finished, this method does the following: 
+     * 1. Check if there are no more missing kuds
+     */
+    isGameFinished(missingKuds: MissingKud[]) {
+
+        return missingKuds == null || missingKuds.length == 0
 
     }
 

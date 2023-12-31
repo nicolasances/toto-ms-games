@@ -11,7 +11,7 @@ import { TotoRuntimeError } from "toto-api-controller/dist/model/TotoRuntimeErro
 import { ValidationError } from "toto-api-controller/dist/validation/Validator";
 import { correlationId } from 'toto-api-controller/dist/util/CorrelationId';
 import * as readline from 'readline';
-import { Db } from 'mongodb';
+import { Db, ObjectId } from 'mongodb';
 
 const storage = new Storage();
 
@@ -149,6 +149,9 @@ async function restoreCollection(db: Db, bucket: Bucket, collection: string, dat
     for await (const line of rl) {
 
         const doc = JSON.parse(line);
+
+        // Replace the _id with a mongo ObjectId
+        doc._id = new ObjectId(doc._id);
 
         batch.push(doc);
 
