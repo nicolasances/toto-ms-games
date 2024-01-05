@@ -119,14 +119,14 @@ export class CattieGame extends Game {
             // Get the category predictions from ExpCat
             this.logger.compute(this.cid, `Getting a Category Prediction from ExpCat..`)
 
-            const { prediction } = await new ExpCatAPI(this.userContext, this.execContext, this.authHeader).predictCategory(chosenTx.description)
+            const { category } = await new ExpCatAPI(this.userContext, this.execContext, this.authHeader).predictCategory(chosenTx.description)
 
-            this.logger.compute(this.cid, `Getting a Category Prediction from ExpCat. Got ${JSON.stringify(prediction)}`)
+            this.logger.compute(this.cid, `Getting a Category Prediction from ExpCat. Got ${JSON.stringify(category)}`)
 
             // Suggested Category
             let suggestedCat = "VARIE"
 
-            if (prediction && prediction.length > 0) suggestedCat = prediction[0];
+            if (category) suggestedCat = category;
 
             // Return the next rount 
             return new CattieRound(chosenTx, suggestedCat)

@@ -48,6 +48,6 @@ export class ExpCatAPI {
 
 export interface ExpcatPrediction {
 
-    prediction: string[]
+    category: string
 
 }
