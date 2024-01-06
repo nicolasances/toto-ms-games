@@ -7,10 +7,22 @@ import { ExpCatAPI } from "../../api/ExpCatAPI";
 import { CattieStore } from "../../store/CattieStore";
 import { TotoRuntimeError } from "toto-api-controller/dist/model/TotoRuntimeError";
 import { ValidationError } from "toto-api-controller/dist/validation/Validator";
+import { UserContext } from "toto-api-controller/dist/model/UserContext";
+import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
+import { CattieGameCache } from "./CattieGameCache";
 
 const POINTS_PER_CATEGORY_PICKED = 10
 
+const cattieGameCache = new CattieGameCache()
+
+/**
+ * Cattie Game
+ */
 export class CattieGame extends Game {
+
+    constructor(userContext: UserContext, execContext: ExecutionContext, authHeader: string) {
+        super(userContext, execContext, authHeader)
+    }
 
     async getGameStatus(): Promise<GameStatus> {
 
@@ -28,8 +40,8 @@ export class CattieGame extends Game {
             const playerScore = count * POINTS_PER_CATEGORY_PICKED
 
             // Return the status
-            return { 
-                score: playerScore, 
+            return {
+                score: playerScore,
                 finished: this.isGameFinished()
             }
 
@@ -88,23 +100,34 @@ export class CattieGame extends Game {
 
         while (!expensesFound) {
 
-            // Randomly choose a YearMonth to get an expense from
-            const pickedYearMonth = new CattieMonthPicker().pickMonth("201802")
+            // If the cache is empty, load new expenses
+            if (cattieGameCache.getFreeExpenses().length == 0) {
 
-            this.logger.compute(this.cid, `Considering Year Month [${pickedYearMonth}]`)
+                // Randomly choose a YearMonth 
+                const pickedYearMonth = new CattieMonthPicker().pickMonth("201802")
 
-            // Grab the expenses for that year month
-            const { expenses } = await new ExpensesAPI(this.userContext, this.execContext, this.authHeader).getExpenses(pickedYearMonth);
+                this.logger.compute(this.cid, `Considering Year Month [${pickedYearMonth}]`)
 
-            this.logger.compute(this.cid, `Got [${expenses?.length}] expenses for that month`)
+                // Grab the expenses for that year month
+                const { expenses } = await new ExpensesAPI(this.userContext, this.execContext, this.authHeader).getExpenses(pickedYearMonth);
 
-            if (!expenses?.length) {
-                expensesFound = false;
-                continue;
+                this.logger.compute(this.cid, `Got [${expenses?.length}] expenses for that month`)
+
+                if (!expenses?.length) {
+                    expensesFound = false;
+                    continue;
+                }
+
+                // Predict the category of all the picked expenses using ExpCat
+                const { categories: predictedCategories } = await new ExpCatAPI(this.userContext, this.execContext, this.authHeader).predictCategoryOfExpenses(expenses)
+
+                // Cache the expenses
+                cattieGameCache.cacheExpenses(expenses, predictedCategories)
+
             }
 
             // Randomly pick one of the expenses
-            const chosenExpense = new CattieRandomExpensePicker().pickOneExpense(expenses)
+            const chosenExpense = new CattieRandomExpensePicker(cattieGameCache).pickOneExpense()
 
             if (chosenExpense == null) {
                 expensesFound = false;
@@ -194,6 +217,7 @@ export class CattieGame extends Game {
 
     }
 }
+
 
 export class CattieTotoTx {
 
