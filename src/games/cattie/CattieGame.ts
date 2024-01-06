@@ -130,6 +130,12 @@ export class CattieGame extends Game {
             const chosenExpense = new CattieRandomExpensePicker(cattieGameCache).pickOneExpense()
 
             if (chosenExpense == null) {
+
+                this.logger.compute(this.cid, `No more expenses in cache. Resetting cache and reloading data.`)
+
+                // Reset the cache
+                cattieGameCache.reset()
+
                 expensesFound = false;
                 continue;
             }

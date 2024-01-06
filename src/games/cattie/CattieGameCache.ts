@@ -38,6 +38,13 @@ export class CattieGameCache {
     }
 
     /**
+     * Resets the cache
+     */
+    reset() {
+        this.expenses = []
+    }
+
+    /**
      * Caches the expenses and predicted categories
      * 
      * It is assumed that the two lists have the SAME INDEX.
