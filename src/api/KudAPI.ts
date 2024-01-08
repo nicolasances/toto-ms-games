@@ -31,7 +31,7 @@ export class KudAPI {
         return new Promise((success, failure) => {
 
             http({
-                uri: this.endpoint + `/transactions?user=${this.userEmail}&paymentsOnly=true&maxResults=${maxResults}`,
+                uri: this.endpoint + `/transactions?user=${this.userEmail}&transactionType=payment&maxResults=${maxResults}`,
                 method: 'GET',
                 headers: {
                     'x-correlation-id': this.cid,
