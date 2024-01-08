@@ -50,7 +50,7 @@ export class RekoncileGame extends Game {
     async isGameFinished(): Promise<boolean> {
 
         // Get the next transaction to reconcile
-        const response = await new KudAPI(this.userContext, this.execContext, this.authHeader).getUnreconciledTransaction(0)
+        const response = await new KudAPI(this.userContext, this.execContext, this.authHeader).getUnreconciledPayment(0)
 
         // Check if there are no more unreconciled transactions
         if (response == null || response.payments == null || response.payments.length == 0) return true;
@@ -80,7 +80,7 @@ export class RekoncileGame extends Game {
     async getNextTransaction(roundsToSkip: number): Promise<GetNextTransactionResponse | null> {
 
         // 1. Call the Kud API to retrieve a transaction
-        const response = await new KudAPI(this.userContext, this.execContext, this.authHeader).getUnreconciledTransaction(roundsToSkip)
+        const response = await new KudAPI(this.userContext, this.execContext, this.authHeader).getUnreconciledPayment(roundsToSkip)
 
         // If there are no more payments available, you're done
         if (response.payments.length == 0) return null;

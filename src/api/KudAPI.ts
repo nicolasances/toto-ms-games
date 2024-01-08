@@ -19,10 +19,13 @@ export class KudAPI {
 
     /**
      * Retrieves the next unreconciled transaction
+     * 
      * @param skipTransactions number of transactions to skip
-     * @returns 
+     * @param transactionType type of transaction
+     * 
+     * @returns GetKudTransactionsResponse
      */
-    async getUnreconciledTransaction(skipTransactions: number): Promise<GetKudTransactionsResponse> {
+    async getUnreconciledTransaction(skipTransactions: number, transactionType: KudTransactionType): Promise<GetKudTransactionsResponse> {
 
         // Calculate the number of transactions to extract
         // The number depends from skipTransactions: if skipTransactions > 0, then retrieve (1 + skipTransactions) transactions
@@ -31,7 +34,7 @@ export class KudAPI {
         return new Promise((success, failure) => {
 
             http({
-                uri: this.endpoint + `/transactions?user=${this.userEmail}&transactionType=payment&maxResults=${maxResults}`,
+                uri: this.endpoint + `/transactions?user=${this.userEmail}&transactionType=${transactionType}&maxResults=${maxResults}`,
                 method: 'GET',
                 headers: {
                     'x-correlation-id': this.cid,
@@ -47,6 +50,16 @@ export class KudAPI {
 
             })
         })
+    }
+
+    /**
+     * Retrieves the next unreconciled transaction
+     * 
+     * @param skipTransactions number of transactions to skip
+     * @returns 
+     */
+    async getUnreconciledPayment(skipTransactions: number): Promise<GetKudTransactionsResponse> {
+        return this.getUnreconciledTransaction(skipTransactions, "payment")
     }
 
     /**
@@ -245,3 +258,5 @@ export interface CountKudTransactionsResponse {
 export interface CountReconciliationsResponse {
     reconciliationCount: number
 }
+
+export type KudTransactionType = 'payment' | 'income' | 'any'
