@@ -1,22 +1,37 @@
 import { TotoExpense } from "../../api/ExpensesAPI";
-
-const cache = [] as string[]
+import { CattieGameCache, CattieGameCacheExpenseWrapper } from "./CattieGameCache";
 
 export class CattieRandomExpensePicker {
+
+    gameCache: CattieGameCache;
+
+    constructor(gameCache: CattieGameCache) {
+        this.gameCache = gameCache
+    }
 
     /**
      * This method will randomly pick one expense from the provided list of Toto Expenses
      * 
-     * Important notes on what it does: 
-     *  -   It caches the picked expenses, so that it won't pick them again anytime soon (at least in a gaming session). 
-     * 
+     * The random process picks expenses by picking miscategorized expenses with higher chance than correctly categorized expenses.
+     * The ration is 2: P(picking miscategorized expense) = 2 * P(picking well categorized expense) 
      * 
      * @param expenses the expenses to pick from
      */
-    pickOneExpense(expenses: TotoExpense[]): TotoExpense | null {
+    pickOneExpense(): TotoExpense | null {
 
-        // Check if there are expenses
-        if (expenses == null || expenses.length == 0) return null;
+        // const expenses: CattieGameCacheExpenseWrapper[] = this.gameCache.getFreeExpenses()
+        const wellCategorizedExpenses = this.gameCache.getFreeWellCategorizedExpenses()
+        const miscategorizedExpenses = this.gameCache.getFreeMiscategorizedExpenses()
+        
+        // Check if there are enough expenses
+        if (wellCategorizedExpenses == null || wellCategorizedExpenses.length == 0) return null;
+        if (miscategorizedExpenses == null || miscategorizedExpenses.length == 0) return null;
+
+        // Duplicate the miscategorized list, so that elements will be picked from it with higher probabilty (2x)
+        const doubleMiscategorizedExpenses = miscategorizedExpenses.map(item => [item, item]).flat()
+
+        // Concatenate the lists to have a unique list of expense to pick from 
+        const expenses = doubleMiscategorizedExpenses.concat(wellCategorizedExpenses)
 
         // Define the max valid index to use
         const maxValidIndex = expenses.length - 1;
@@ -32,17 +47,14 @@ export class CattieRandomExpensePicker {
             // Extract the expense
             const expense = expenses[index]
 
-            // If the expense is in the cache, go to the next
-            if (cache.includes(expense.id!)) continue;
-
-            // Cache the expense's id
-            cache.push(expense.id!)
+            // Now flag that expense as "used"
+            this.gameCache.useExpense(expense)
 
             // Return the expense
-            return expense;
+            return expense.expense;
 
         }
-        while (i++ < 100)
+        while (i++ < 200)
 
         return null;
 
