@@ -184,12 +184,12 @@ export class KudAPI {
      * Counts the reconciliations
      * @returns Promise<CountReconciliationsResponse> the count
      */
-    async countReconciliations(): Promise<CountReconciliationsResponse> {
+    async countReconciliations(txType: KudTransactionType): Promise<CountReconciliationsResponse> {
 
         return new Promise((success, failure) => {
 
             http({
-                uri: this.endpoint + `/reconciliations/count?user=${this.userEmail}`,
+                uri: this.endpoint + `/reconciliations/count?transactionType=${txType}`,
                 method: 'GET',
                 headers: {
                     'x-correlation-id': this.cid,
@@ -220,7 +220,7 @@ export interface KudTransaction {
 }
 
 export interface GetKudTransactionsResponse {
-    payments: KudTransaction[]
+    transactions: KudTransaction[]
 }
 
 export interface ReconciliationKudPayment {

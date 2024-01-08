@@ -40,6 +40,35 @@ export class ExpensesAPI {
         })
     }
 
+    /**
+     * Retrieves the incomes of the specified yearMonth
+     * 
+     * @param yearMonth the yearmonth to consider
+     * @returns the incomes of that year month
+     */
+    async getIncomes(yearMonth: string): Promise<GetIncomesResponse> {
+
+        return new Promise((success, failure) => {
+
+            http({
+                uri: this.endpoint + `/incomes?yearMonth=${yearMonth}`,
+                method: 'GET',
+                headers: {
+                    'x-correlation-id': this.cid,
+                    'Authorization': this.authorizationHeader
+                }
+            }, (err: any, resp: any, body: any) => {
+
+                if (err) {
+                    console.log(err)
+                    failure(err);
+                }
+                else success(JSON.parse(body));
+
+            })
+        })
+    }
+
     async consolidateExpense(expenseId: string) {
 
         return new Promise((success, failure) => {
@@ -141,6 +170,39 @@ export interface PostExpenseResult {
 
 export interface GetExpensesResponse {
     expenses: TotoExpense[]
+}
+export interface GetIncomesResponse {
+    incomes: TotoIncome[]
+}
+
+export class TotoIncome {
+
+    id?: string
+    amount: number
+    currency: string
+    category: string 
+    rateToEur?: number
+    amountInEuro?: number
+    date: string
+    description: string
+    yearMonth: number
+    consolidated: boolean = false
+    user: string
+
+    constructor(amount: number, date: string, description: string, currency: string, user: string, category: string) {
+
+        this.amount = amount
+        this.date = date
+        this.description = description
+        this.currency = currency
+        this.user = user
+        this.category = category
+
+        // Set the year month
+        this.yearMonth = parseInt(moment(date, "YYYYMMDD").format("YYYYMM"))
+
+    }
+
 }
 
 export class TotoExpense {
