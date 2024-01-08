@@ -30,7 +30,7 @@ export class PostReconcilitation implements TotoDelegate {
         // Update the Toto Expense on the Expense API
         logger.compute(cid, `Updating Toto Expense [${totoTransaction.id}]. Setting to "Consolidated".`)
 
-        await new ExpensesAPI(userContext, execContext, String(extractAuthHeader(req))).consolidateExpense(totoTransaction.id!)
+        await new ExpensesAPI(userContext, execContext, String(extractAuthHeader(req))).consolidateTransaction(totoTransaction.id!)
 
         return {kudReconciled: true, expenseUpdated: true}
 

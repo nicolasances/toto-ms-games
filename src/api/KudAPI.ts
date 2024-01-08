@@ -1,5 +1,5 @@
 import http from 'request'
-import { TotoExpense } from './ExpensesAPI';
+import { TotoExpense, TotoIncome } from './ExpensesAPI';
 import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
 import { UserContext } from "toto-api-controller/dist/model/UserContext";
 
@@ -117,7 +117,7 @@ export class KudAPI {
         })
     }
 
-    async postReconciliation(kudTransaction: KudTransaction, totoExpense: TotoExpense) {
+    async postReconciliation(kudTransaction: KudTransaction, totoTransaction: TotoExpense | TotoIncome) {
 
         return new Promise((success, failure) => {
 
@@ -131,7 +131,7 @@ export class KudAPI {
                 },
                 body: JSON.stringify({
                     kudPayment: kudTransaction,
-                    totoTransaction: totoExpense
+                    totoTransaction: totoTransaction
                 })
             }, (err: any, resp: any, body: any) => {
 

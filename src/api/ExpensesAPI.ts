@@ -69,12 +69,14 @@ export class ExpensesAPI {
         })
     }
 
-    async consolidateExpense(expenseId: string) {
+    async consolidateTransaction(totoTransactionId: string, transactionType: "income" | "payment") {
 
         return new Promise((success, failure) => {
 
+            let apiEndpoint = transactionType == "payment" ? "expenses" : "incomes"
+
             http({
-                uri: this.endpoint + `/expenses/${expenseId}`,
+                uri: this.endpoint + `/${apiEndpoint}/${totoTransactionId}`,
                 method: 'PUT',
                 headers: {
                     'x-correlation-id': this.cid,
@@ -162,9 +164,44 @@ export class ExpensesAPI {
         })
 
     }
+
+    /**
+     * POSTs the income to the Expenses API
+     * 
+     * @param income the income to POST
+     * @returns an income id
+     */
+    async postIncome(income: TotoIncome): Promise<PostIncomeResult> {
+
+        return new Promise((success, failure) => {
+
+            http({
+                uri: this.endpoint + `/incomes`,
+                method: 'POST',
+                headers: {
+                    'x-correlation-id': this.cid,
+                    'Authorization': this.authorizationHeader,
+                    'Content-Type': "application/json",
+                },
+                body: JSON.stringify(income)
+            }, (err: any, resp: any, body: any) => {
+
+                if (err) {
+                    console.log(err)
+                    failure(err);
+                }
+                else success(JSON.parse(body))
+
+            })
+        })
+
+    }
 }
 
 export interface PostExpenseResult {
+    id: string
+}
+export interface PostIncomeResult {
     id: string
 }
 
