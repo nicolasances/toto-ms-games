@@ -130,7 +130,7 @@ export class KudAPI {
                     'Content-Type': "application/json",
                 },
                 body: JSON.stringify({
-                    kudPayment: kudTransaction,
+                    kudTransaction: kudTransaction,
                     totoTransaction: totoTransaction
                 })
             }, (err: any, resp: any, body: any) => {

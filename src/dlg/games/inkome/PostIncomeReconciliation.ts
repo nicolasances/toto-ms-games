@@ -7,7 +7,7 @@ import { TotoDelegate } from "toto-api-controller/dist/model/TotoDelegate";
 import { UserContext } from "toto-api-controller/dist/model/UserContext";
 import { ValidationError } from "toto-api-controller/dist/validation/Validator";
 
-export class PostReconcilitation implements TotoDelegate {
+export class PostIncomeReconciliation implements TotoDelegate {
 
     async do(req: Request, userContext: UserContext, execContext: ExecutionContext): Promise<any> {
 
@@ -15,24 +15,24 @@ export class PostReconcilitation implements TotoDelegate {
         const cid = execContext.cid;
 
         // Extract input
-        const kudPayment = req.body.kudPayment as KudTransaction
+        const kudIncome = req.body.kudIncome as KudTransaction
         const totoTransaction = req.body.totoTransaction as TotoExpense
 
         // Validate input
-        if (!kudPayment) throw new ValidationError(400, "Missing Kud Payment")
+        if (!kudIncome) throw new ValidationError(400, "Missing Kud Income")
         if (!totoTransaction) throw new ValidationError(400, "Missing Toto Transaction")
 
         // Post the Reconciliation on Kud API
-        logger.compute(cid, `Posting a Kud Reconciliation for Kud Transaction [${kudPayment.id}] and Toto Expense [${totoTransaction.id}]`)
+        logger.compute(cid, `Posting a Kud Reconciliation for Kud Transaction [${kudIncome.id}] and Toto Expense [${totoTransaction.id}]`)
 
-        await new KudAPI(userContext, execContext, String(extractAuthHeader(req))).postReconciliation(kudPayment, totoTransaction);
+        await new KudAPI(userContext, execContext, String(extractAuthHeader(req))).postReconciliation(kudIncome, totoTransaction);
 
         // Update the Toto Expense on the Expense API
-        logger.compute(cid, `Updating Toto Expense [${totoTransaction.id}]. Setting to "Consolidated".`)
+        logger.compute(cid, `Updating Toto Income [${totoTransaction.id}]. Setting to "Consolidated".`)
 
-        await new ExpensesAPI(userContext, execContext, String(extractAuthHeader(req))).consolidateTransaction(totoTransaction.id!, "payment")
+        await new ExpensesAPI(userContext, execContext, String(extractAuthHeader(req))).consolidateTransaction(totoTransaction.id!, "income")
 
-        return {kudReconciled: true, expenseUpdated: true}
+        return {kudReconciled: true, totoIncomeUpdated: true}
 
     }
 }
