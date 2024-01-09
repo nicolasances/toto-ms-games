@@ -69,11 +69,16 @@ export class ExpensesAPI {
         })
     }
 
-    async consolidateTransaction(totoTransactionId: string, transactionType: "income" | "payment") {
+    async consolidateTransaction(totoTransactionId: string, transactionType: "income" | "payment", newCategory?: string) {
 
         return new Promise((success, failure) => {
 
             let apiEndpoint = transactionType == "payment" ? "expenses" : "incomes"
+
+            let body = { consolidated: true } as any
+
+            // If a new category is provided, add it
+            if (newCategory != null) body.category = newCategory
 
             http({
                 uri: this.endpoint + `/${apiEndpoint}/${totoTransactionId}`,
@@ -83,9 +88,7 @@ export class ExpensesAPI {
                     'Authorization': this.authorizationHeader,
                     'Content-Type': "application/json",
                 },
-                body: JSON.stringify({
-                    consolidated: true
-                })
+                body: JSON.stringify(body)
             }, (err: any, resp: any, body: any) => {
 
                 if (err) {
@@ -217,7 +220,7 @@ export class TotoIncome {
     id?: string
     amount: number
     currency: string
-    category: string 
+    category: string
     rateToEur?: number
     amountInEuro?: number
     date: string

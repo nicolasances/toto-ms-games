@@ -17,6 +17,10 @@ export class PostIncomeReconciliation implements TotoDelegate {
         // Extract input
         const kudIncome = req.body.kudIncome as KudTransaction
         const totoTransaction = req.body.totoTransaction as TotoExpense
+        const category = req.body.category 
+
+        // Valdiate
+        if (!category) throw new ValidationError(400, `Missing category for the Income transaction`)
 
         // Validate input
         if (!kudIncome) throw new ValidationError(400, "Missing Kud Income")
@@ -27,11 +31,11 @@ export class PostIncomeReconciliation implements TotoDelegate {
 
         await new KudAPI(userContext, execContext, String(extractAuthHeader(req))).postReconciliation(kudIncome, totoTransaction);
 
-        // Update the Toto Expense on the Expense API
+        // Update the Toto Expense on the Expense API, including the recategorization
         logger.compute(cid, `Updating Toto Income [${totoTransaction.id}]. Setting to "Consolidated".`)
 
-        await new ExpensesAPI(userContext, execContext, String(extractAuthHeader(req))).consolidateTransaction(totoTransaction.id!, "income")
-
+        await new ExpensesAPI(userContext, execContext, String(extractAuthHeader(req))).consolidateTransaction(totoTransaction.id!, "income", category)
+        
         return {kudReconciled: true, totoIncomeUpdated: true}
 
     }
