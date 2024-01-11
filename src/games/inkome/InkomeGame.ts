@@ -94,7 +94,7 @@ export class InkomeGame extends Game {
             if (reconciliationsMap.includes(totoIncome.id!)) continue;
 
             // Calculate how "distant" the amount is, in percentage
-            const amountDifference = Math.abs(totoIncome.amount - Math.abs(kudIncome.amount)) / totoIncome.amount;
+            const amountDifference = Math.abs(totoIncome.amount - Math.abs(kudIncome.amount));
 
             // Check that the amount is "close enough"
             if (amountDifference > AMOUNT_TOLERANCE) continue;
