@@ -26,7 +26,7 @@ export class RekoncileGame extends Game {
         const kudAPI = new KudAPI(this.userContext, this.execContext, this.authHeader)
 
         // Count the number of Reconciliations
-        const { reconciliationCount } = await kudAPI.countReconciliations()
+        const { reconciliationCount } = await kudAPI.countReconciliations("payment")
 
         // Calculate the score
         const score = reconciliationCount * SCORE_PER_RECONCILIATION
@@ -50,10 +50,10 @@ export class RekoncileGame extends Game {
     async isGameFinished(): Promise<boolean> {
 
         // Get the next transaction to reconcile
-        const response = await new KudAPI(this.userContext, this.execContext, this.authHeader).getUnreconciledTransaction(0)
+        const response = await new KudAPI(this.userContext, this.execContext, this.authHeader).getUnreconciledPayment(0)
 
         // Check if there are no more unreconciled transactions
-        if (response == null || response.payments == null || response.payments.length == 0) return true;
+        if (response == null || response.transactions == null || response.transactions.length == 0) return true;
 
         return false;
 
@@ -80,18 +80,18 @@ export class RekoncileGame extends Game {
     async getNextTransaction(roundsToSkip: number): Promise<GetNextTransactionResponse | null> {
 
         // 1. Call the Kud API to retrieve a transaction
-        const response = await new KudAPI(this.userContext, this.execContext, this.authHeader).getUnreconciledTransaction(roundsToSkip)
+        const response = await new KudAPI(this.userContext, this.execContext, this.authHeader).getUnreconciledPayment(roundsToSkip)
 
         // If there are no more payments available, you're done
-        if (response.payments.length == 0) return null;
+        if (response.transactions.length == 0) return null;
 
         let kudPayment;
 
         // The payment is the one at index "roundsToSkip"
         // If roundsToSkip = 0 then you'll get the only payment, at position 0, otherwise you'll get the last payment in the returned array
-        if (response.payments.length == roundsToSkip + 1) kudPayment = response.payments[roundsToSkip];
+        if (response.transactions.length == roundsToSkip + 1) kudPayment = response.transactions[roundsToSkip];
         // If there's not enough data, return the first available transaction
-        else kudPayment = response.payments[0];
+        else kudPayment = response.transactions[0];
 
 
         // 2. Call the Expenses API to get all expenses in the same year-month

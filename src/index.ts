@@ -16,6 +16,10 @@ import { GetCattieGameStatus } from "./dlg/games/cattie/GetCattieGameStatus";
 import { StartBackup } from "./dlg/backup/StartBackup";
 import { StartRestore } from "./dlg/backup/StartRestore";
 import { InvalidateKudTransaction } from "./dlg/games/rekoncile/InvalidateKudTransaction";
+import { GetNextIncome } from "./dlg/games/inkome/GetNextIncome";
+import { CreateTotoIncome } from "./dlg/games/inkome/CreateTotoIncome";
+import { InvalidateKudIncome } from "./dlg/games/inkome/InvalidateKudIncome";
+import { PostIncomeReconciliation } from "./dlg/games/inkome/PostIncomeReconciliation";
 
 const api = new TotoAPIController("toto-ms-games", new ControllerConfig())
 
@@ -35,6 +39,11 @@ api.path('POST', '/games/rekoncile/expenses', new CreateTotoExpense())
 api.path('GET', '/games/cattie/next', new GetNextCattieRound())
 api.path('POST', '/games/cattie/selections', new ChooseCategory())
 api.path('GET', '/games/cattie', new GetCattieGameStatus())
+
+api.path('GET', '/games/inkome/next', new GetNextIncome())
+api.path('POST', '/games/inkome/reconciliations', new PostIncomeReconciliation())
+api.path('POST', '/games/inkome/incomes', new CreateTotoIncome())
+api.path('POST', '/games/inkome/invalidate', new InvalidateKudIncome())
 
 api.path('POST', '/events/kud', new KudEventHandlerHook())
 

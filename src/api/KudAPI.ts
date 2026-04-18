@@ -1,5 +1,5 @@
 import http from 'request'
-import { TotoExpense } from './ExpensesAPI';
+import { TotoExpense, TotoIncome } from './ExpensesAPI';
 import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
 import { UserContext } from "toto-api-controller/dist/model/UserContext";
 
@@ -19,10 +19,13 @@ export class KudAPI {
 
     /**
      * Retrieves the next unreconciled transaction
+     * 
      * @param skipTransactions number of transactions to skip
-     * @returns 
+     * @param transactionType type of transaction
+     * 
+     * @returns GetKudTransactionsResponse
      */
-    async getUnreconciledTransaction(skipTransactions: number): Promise<GetKudTransactionsResponse> {
+    async getUnreconciledTransaction(skipTransactions: number, transactionType: KudTransactionType): Promise<GetKudTransactionsResponse> {
 
         // Calculate the number of transactions to extract
         // The number depends from skipTransactions: if skipTransactions > 0, then retrieve (1 + skipTransactions) transactions
@@ -31,7 +34,7 @@ export class KudAPI {
         return new Promise((success, failure) => {
 
             http({
-                uri: this.endpoint + `/transactions?user=${this.userEmail}&paymentsOnly=true&maxResults=${maxResults}`,
+                uri: this.endpoint + `/transactions?user=${this.userEmail}&transactionType=${transactionType}&maxResults=${maxResults}`,
                 method: 'GET',
                 headers: {
                     'x-correlation-id': this.cid,
@@ -47,6 +50,16 @@ export class KudAPI {
 
             })
         })
+    }
+
+    /**
+     * Retrieves the next unreconciled transaction
+     * 
+     * @param skipTransactions number of transactions to skip
+     * @returns 
+     */
+    async getUnreconciledPayment(skipTransactions: number): Promise<GetKudTransactionsResponse> {
+        return this.getUnreconciledTransaction(skipTransactions, "payment")
     }
 
     /**
@@ -104,7 +117,7 @@ export class KudAPI {
         })
     }
 
-    async postReconciliation(kudTransaction: KudTransaction, totoExpense: TotoExpense) {
+    async postReconciliation(kudTransaction: KudTransaction, totoTransaction: TotoExpense | TotoIncome) {
 
         return new Promise((success, failure) => {
 
@@ -117,8 +130,8 @@ export class KudAPI {
                     'Content-Type': "application/json",
                 },
                 body: JSON.stringify({
-                    kudPayment: kudTransaction,
-                    totoTransaction: totoExpense
+                    kudTransaction: kudTransaction,
+                    totoTransaction: totoTransaction
                 })
             }, (err: any, resp: any, body: any) => {
 
@@ -171,12 +184,12 @@ export class KudAPI {
      * Counts the reconciliations
      * @returns Promise<CountReconciliationsResponse> the count
      */
-    async countReconciliations(): Promise<CountReconciliationsResponse> {
+    async countReconciliations(txType: KudTransactionType): Promise<CountReconciliationsResponse> {
 
         return new Promise((success, failure) => {
 
             http({
-                uri: this.endpoint + `/reconciliations/count?user=${this.userEmail}`,
+                uri: this.endpoint + `/reconciliations/count?transactionType=${txType}`,
                 method: 'GET',
                 headers: {
                     'x-correlation-id': this.cid,
@@ -207,7 +220,7 @@ export interface KudTransaction {
 }
 
 export interface GetKudTransactionsResponse {
-    payments: KudTransaction[]
+    transactions: KudTransaction[]
 }
 
 export interface ReconciliationKudPayment {
@@ -245,3 +258,5 @@ export interface CountKudTransactionsResponse {
 export interface CountReconciliationsResponse {
     reconciliationCount: number
 }
+
+export type KudTransactionType = 'payment' | 'income' | 'any'

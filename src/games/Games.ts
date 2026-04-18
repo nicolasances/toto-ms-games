@@ -1,4 +1,5 @@
 import { CattieGame } from "./cattie/CattieGame";
+import { InkomeGame } from "./inkome/InkomeGame";
 import { KuploadGame } from "./kud/KuploadGame";
 import { RekoncileGame } from "./rekoncile/RekoncileGame";
 import { ExecutionContext } from "toto-api-controller/dist/model/ExecutionContext";
@@ -20,14 +21,11 @@ export const Games: IIndexable = {
         desc: "Verify the categoy of your Toto Payments", 
         newManager: (userContext: UserContext, execContext: ExecutionContext, authHeader: string) => { return new CattieGame(userContext, execContext, authHeader) }
     }, 
-    cashin: {
-        id: "cashin",
-        desc: "Register your incomes into Toto, month by month"
+    inkome: {
+        id: "inkome",
+        desc: "Reconcile your incomes with Kontoudskrift", 
+        newManager: (userContext: UserContext, execContext: ExecutionContext, authHeader: string) => { return new InkomeGame(userContext, execContext, authHeader) }
     },
-    kashrek: {
-        id: "kashrek",
-        desc: "Reconcile your Toto incomes with Kontoudskrift incomes"
-    }
 }
 
 interface IIndexable {

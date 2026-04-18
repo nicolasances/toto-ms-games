@@ -40,21 +40,55 @@ export class ExpensesAPI {
         })
     }
 
-    async consolidateExpense(expenseId: string) {
+    /**
+     * Retrieves the incomes of the specified yearMonth
+     * 
+     * @param yearMonth the yearmonth to consider
+     * @returns the incomes of that year month
+     */
+    async getIncomes(yearMonth: string): Promise<GetIncomesResponse> {
 
         return new Promise((success, failure) => {
 
             http({
-                uri: this.endpoint + `/expenses/${expenseId}`,
+                uri: this.endpoint + `/incomes?yearMonth=${yearMonth}`,
+                method: 'GET',
+                headers: {
+                    'x-correlation-id': this.cid,
+                    'Authorization': this.authorizationHeader
+                }
+            }, (err: any, resp: any, body: any) => {
+
+                if (err) {
+                    console.log(err)
+                    failure(err);
+                }
+                else success(JSON.parse(body));
+
+            })
+        })
+    }
+
+    async consolidateTransaction(totoTransactionId: string, transactionType: "income" | "payment", newCategory?: string) {
+
+        return new Promise((success, failure) => {
+
+            let apiEndpoint = transactionType == "payment" ? "expenses" : "incomes"
+
+            let body = { consolidated: true } as any
+
+            // If a new category is provided, add it
+            if (newCategory != null) body.category = newCategory
+
+            http({
+                uri: this.endpoint + `/${apiEndpoint}/${totoTransactionId}`,
                 method: 'PUT',
                 headers: {
                     'x-correlation-id': this.cid,
                     'Authorization': this.authorizationHeader,
                     'Content-Type': "application/json",
                 },
-                body: JSON.stringify({
-                    consolidated: true
-                })
+                body: JSON.stringify(body)
             }, (err: any, resp: any, body: any) => {
 
                 if (err) {
@@ -133,14 +167,82 @@ export class ExpensesAPI {
         })
 
     }
+
+    /**
+     * POSTs the income to the Expenses API
+     * 
+     * @param income the income to POST
+     * @returns an income id
+     */
+    async postIncome(income: TotoIncome): Promise<PostIncomeResult> {
+
+        return new Promise((success, failure) => {
+
+            http({
+                uri: this.endpoint + `/incomes`,
+                method: 'POST',
+                headers: {
+                    'x-correlation-id': this.cid,
+                    'Authorization': this.authorizationHeader,
+                    'Content-Type': "application/json",
+                },
+                body: JSON.stringify(income)
+            }, (err: any, resp: any, body: any) => {
+
+                if (err) {
+                    console.log(err)
+                    failure(err);
+                }
+                else success(JSON.parse(body))
+
+            })
+        })
+
+    }
 }
 
 export interface PostExpenseResult {
     id: string
 }
+export interface PostIncomeResult {
+    id: string
+}
 
 export interface GetExpensesResponse {
     expenses: TotoExpense[]
+}
+export interface GetIncomesResponse {
+    incomes: TotoIncome[]
+}
+
+export class TotoIncome {
+
+    id?: string
+    amount: number
+    currency: string
+    category: string
+    rateToEur?: number
+    amountInEuro?: number
+    date: string
+    description: string
+    yearMonth: number
+    consolidated: boolean = false
+    user: string
+
+    constructor(amount: number, date: string, description: string, currency: string, user: string, category: string) {
+
+        this.amount = amount
+        this.date = date
+        this.description = description
+        this.currency = currency
+        this.user = user
+        this.category = category
+
+        // Set the year month
+        this.yearMonth = parseInt(moment(date, "YYYYMMDD").format("YYYYMM"))
+
+    }
+
 }
 
 export class TotoExpense {

@@ -60,7 +60,7 @@ export class CreateTotoExpense implements TotoDelegate {
         // Update the Toto Expense on the Expense API, marking it as "consolidated"
         logger.compute(cid, `Updating Toto Expense [${totoExpense.id}]. Setting to "Consolidated".`)
 
-        await new ExpensesAPI(userContext, execContext, String(extractAuthHeader(req))).consolidateExpense(totoExpense.id)
+        await new ExpensesAPI(userContext, execContext, String(extractAuthHeader(req))).consolidateTransaction(totoExpense.id, "payment")
 
         // Done! 
         return { totoExpenseId: expenseId }
